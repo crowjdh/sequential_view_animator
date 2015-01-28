@@ -53,18 +53,28 @@ public class SequentialViewAnimator {
 
     public void animate() {
         if (isReadyForAnimation()) {
+            cancelAll();
             prepareForNewAnimationSequence();
             runSequentialAnimation();
+        }
+    }
+
+    // TODO refactor
+    private void cancelAll() {
+        mAnimationHandler.removeCallbacksAndMessages(null);
+        for (int i = 0; i < mAnimateViewProperties.size(); i++) {
+            int propertyIndex = mAnimateViewProperties.keyAt(i);
+            AnimateViewProperty property = mAnimateViewProperties.get(propertyIndex);
+
+            property.getView().clearAnimation();
         }
     }
 
     private void runSequentialAnimation() {
         int viewCount = mAnimateViewProperties.size();
         for (int i = 0; i < viewCount; i++) {
-            // TODO index ordering
+            // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
             int propertyIndex = mAnimateViewProperties.keyAt(i);
-            // TODO transient!! 화면 회전시 뷰 재생성 막자!
-            //
             AnimateViewProperty property = mAnimateViewProperties.get(propertyIndex);
             requestAnimation(property);
         }
@@ -98,6 +108,8 @@ public class SequentialViewAnimator {
     }
 
     private static void startAnimation(AnimateViewProperty property, Animation animation) {
+        // TODO transient!! 화면 회전시 뷰 재생성 막자!
+        //
         View viewToAnimate = property.getView();
         viewToAnimate.startAnimation(animation);
     }
@@ -124,7 +136,7 @@ public class SequentialViewAnimator {
     }
 
     private void prepareForNewAnimationSequence() {
-        mIsAnimating = true;
+//        mIsAnimating = true;
         mStartTimeInMilli = System.currentTimeMillis();
     }
 
