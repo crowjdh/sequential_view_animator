@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import com.yooiistudios.sequentialanimation.R;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
-import com.yooiistudios.sequentialanimation.ui.animation.property.AnimationProperty;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
@@ -73,7 +72,7 @@ public class StaticLayoutFragment extends BaseFragment {
         animator.putAnimateViewPropertyAt(property2, 2);
         animator.putAnimateViewPropertyAt(property3, 3);
 
-        AnimationProperty transitionProperty = new AnimationProperty(this, 0, 1000);
+        SerialAnimationAnimator.AnimationProperty transitionProperty = new SerialAnimationAnimator.AnimationProperty(this, 0, 1000);
 
         animator.setTransitionProperty(transitionProperty);
 

@@ -10,7 +10,7 @@ import android.view.animation.Animation;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
-import com.yooiistudios.sequentialanimation.ui.animation.property.TransitionProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator.TransitionProperty;
 import com.yooiistudios.sequentialanimation.ui.Animatable;
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
 

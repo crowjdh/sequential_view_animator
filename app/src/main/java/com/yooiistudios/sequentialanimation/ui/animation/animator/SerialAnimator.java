@@ -2,10 +2,10 @@ package com.yooiistudios.sequentialanimation.ui.animation.animator;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
-import com.yooiistudios.sequentialanimation.ui.animation.property.TransitionProperty;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -13,10 +13,10 @@ import java.util.List;
 /**
  * Created by Dongheyon Jeong in News-Android-L from Yooii Studios Co., LTD. on 15. 1. 27.
  *
- * SequentialViewAnimator
+ * SerialAnimator
  *  순차적으로 뷰들을 animating 하는 클래스
  */
-public abstract class SerialAnimator<T extends TransitionProperty> {
+public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty> {
     private final SparseArray<ViewProperty> mViewProperties;
     private T mTransitionProperty;
     private TransitionHandler mTransitionHandler;
@@ -134,5 +134,54 @@ public abstract class SerialAnimator<T extends TransitionProperty> {
                         + ViewProperty.class.getSimpleName());
             }
         }
+    }
+
+    public static abstract class TransitionProperty<T> {
+        public interface AnimationSupplier<T> {
+            public @NonNull List<T> onSupplyTransitionList();
+        }
+
+        private AnimationSupplier<T> mAnimationSupplier;
+        private long mInitialDelayInMillisec;
+        private long mIntervalInMillisec;
+
+        // TODO factory로 만들어야 하나?
+        public TransitionProperty(AnimationSupplier<T> animationSupplier,
+                                  long initialDelayInMillisec, long intervalInMillisec) {
+            throwIfParametersAreInvalid(initialDelayInMillisec, intervalInMillisec);
+
+            mAnimationSupplier = animationSupplier;
+            mInitialDelayInMillisec = initialDelayInMillisec;
+            mIntervalInMillisec = intervalInMillisec;
+        }
+
+        private void throwIfParametersAreInvalid(long initialDelayInMillisec,
+                                                 long intervalInMillisec) {
+            if (initialDelayInMillisec < 0 || intervalInMillisec < 0) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        protected AnimationSupplier<T> getAnimationSupplier() {
+            return mAnimationSupplier;
+        }
+
+        public long getInitialDelayInMillisec() {
+            return mInitialDelayInMillisec;
+        }
+
+        public long getIntervalInMillisec() {
+            return mIntervalInMillisec;
+        }
+
+        public List<T> getTransitions() {
+            return mAnimationSupplier.onSupplyTransitionList();
+        }
+
+        public abstract long getDelay(ViewProperty property);
+
+        protected abstract long getDelayBetweenViews(ViewProperty property);
+
+        protected abstract long getDelayBetweenAnimations(ViewProperty property);
     }
 }

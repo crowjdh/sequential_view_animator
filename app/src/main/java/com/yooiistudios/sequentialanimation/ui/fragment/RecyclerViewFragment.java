@@ -10,10 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimation.R;
+import com.yooiistudios.sequentialanimation.ui.SimpleAdapter;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
-import com.yooiistudios.sequentialanimation.ui.animation.property.AnimationProperty;
-import com.yooiistudios.sequentialanimation.ui.SimpleAdapter;
 import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoration;
 
 /**
@@ -110,7 +109,7 @@ public class RecyclerViewFragment extends BaseFragment {
             animator.putAnimateViewPropertyAt(property, i);
         }
 
-        AnimationProperty transitionProperty = new AnimationProperty(this, 0, 1000);
+        SerialAnimationAnimator.AnimationProperty transitionProperty = new SerialAnimationAnimator.AnimationProperty(this, 0, 1000);
         animator.setTransitionProperty(transitionProperty);
 
         animator.animate();
