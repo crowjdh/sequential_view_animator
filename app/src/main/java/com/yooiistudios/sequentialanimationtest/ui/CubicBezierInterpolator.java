@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest;
+package com.yooiistudios.sequentialanimationtest.ui;
 
 import android.graphics.PointF;
 import android.view.animation.Interpolator;

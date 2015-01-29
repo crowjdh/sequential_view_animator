@@ -3,7 +3,7 @@ package com.yooiistudios.sequentialanimationtest.sequentialanimation.animator;
 import android.view.View;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimationtest.AnimationListenerImpl;
+import com.yooiistudios.sequentialanimationtest.ui.AnimationListenerImpl;
 import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
 import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewUtils;
 import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.AnimationProperty;

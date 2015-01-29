@@ -5,7 +5,6 @@ import android.os.Build;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimationtest.CubicBezierInterpolator;
 import com.yooiistudios.sequentialanimationtest.R;
 
 /**
