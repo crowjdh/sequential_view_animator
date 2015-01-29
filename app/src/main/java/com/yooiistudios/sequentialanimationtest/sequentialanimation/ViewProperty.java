@@ -8,9 +8,9 @@ import android.view.View;
  * ViewProperty
  *  애니메이션될 뷰의 속성
  */
-public class AnimateViewProperty {
+public class ViewProperty {
     public interface AnimationListener {
-        public void onAnimationEnd(AnimateViewProperty property);
+        public void onAnimationEnd(ViewProperty property);
     }
     private View mView;
     private AnimationListener mAnimationListener;
@@ -18,7 +18,7 @@ public class AnimateViewProperty {
     private int mAnimationIndex;
     private boolean mIsAnimating;
 
-    public AnimateViewProperty() {
+    public ViewProperty() {
         mAnimationIndex = 0;
         mIsAnimating = true;
     }
@@ -47,7 +47,7 @@ public class AnimateViewProperty {
         mViewIndex = viewIndex;
     }
 
-    public int getAnimationIndex() {
+    public int getTransitionIndex() {
         return mAnimationIndex;
     }
 
@@ -55,7 +55,7 @@ public class AnimateViewProperty {
         mAnimationIndex = animationIndex;
     }
 
-    public void increaseAnimationIndex() {
+    public void increaseTransitionIndex() {
         mAnimationIndex++;
     }
 
@@ -99,8 +99,8 @@ public class AnimateViewProperty {
             return this;
         }
 
-        public AnimateViewProperty build() {
-            AnimateViewProperty property = new AnimateViewProperty();
+        public ViewProperty build() {
+            ViewProperty property = new ViewProperty();
             property.setView(mView);
             property.setViewIndex(mViewIndex);
             property.setAnimating(mIsAnimating);

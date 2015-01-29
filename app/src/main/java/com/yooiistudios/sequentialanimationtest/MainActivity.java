@@ -16,7 +16,6 @@ import com.yooiistudios.sequentialanimationtest.ui.fragment.StaticLayoutFragment
 
 public class MainActivity extends ActionBarActivity
         implements View.OnClickListener {
-    private static final String TAG = MainActivity.class.getSimpleName();
     private static final String TAG_FRAGMENT_STATIC = "TAG_FRAGMENT_STATIC";
     private static final String TAG_FRAGMENT_RECYCLER = "TAG_FRAGMENT_RECYCLER";
     private static final String[] TAG_LIST = { TAG_FRAGMENT_STATIC, TAG_FRAGMENT_RECYCLER };

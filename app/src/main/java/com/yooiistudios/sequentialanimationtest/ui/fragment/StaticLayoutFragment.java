@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimationtest.R;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.AnimateViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialAnimationProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialViewAnimator;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.AnimationProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.AnimationAnimator;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
@@ -17,8 +17,6 @@ import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialVi
  * StaticLayoutFragment
  */
 public class StaticLayoutFragment extends BaseFragment {
-    private static final String TAG = StaticLayoutFragment.class.getSimpleName();
-
     private View mTarget0;
     private View mTarget1;
     private View mTarget2;
@@ -44,42 +42,41 @@ public class StaticLayoutFragment extends BaseFragment {
 
     @Override
     public void startAnimation() {
-        AnimateViewProperty property0 =
-                new AnimateViewProperty.Builder()
+        ViewProperty property0 =
+                new ViewProperty.Builder()
                         .setView(mTarget0)
                         .setViewIndex(0)
                         .setAnimationListener(this)
                         .build();
-        AnimateViewProperty property1 =
-                new AnimateViewProperty.Builder()
+        ViewProperty property1 =
+                new ViewProperty.Builder()
                         .setView(mTarget1)
                         .setViewIndex(1)
                         .setAnimationListener(this)
                         .build();
-        AnimateViewProperty property2 =
-                new AnimateViewProperty.Builder()
+        ViewProperty property2 =
+                new ViewProperty.Builder()
                         .setView(mTarget2)
                         .setViewIndex(2)
                         .setAnimationListener(this)
                         .build();
-        AnimateViewProperty property3 =
-                new AnimateViewProperty.Builder()
+        ViewProperty property3 =
+                new ViewProperty.Builder()
                         .setView(mTarget3)
                         .setViewIndex(3)
                         .setAnimationListener(this)
                         .build();
 
-        SequentialViewAnimator animatorInstance = SequentialViewAnimator.getInstance();
-        animatorInstance.putAnimateViewPropertyAt(property0, 0);
-        animatorInstance.putAnimateViewPropertyAt(property1, 1);
-        animatorInstance.putAnimateViewPropertyAt(property2, 2);
-        animatorInstance.putAnimateViewPropertyAt(property3, 3);
+        AnimationAnimator animator = (AnimationAnimator)getSequentialViewAnimator();
+        animator.putAnimateViewPropertyAt(property0, 0);
+        animator.putAnimateViewPropertyAt(property1, 1);
+        animator.putAnimateViewPropertyAt(property2, 2);
+        animator.putAnimateViewPropertyAt(property3, 3);
 
-        SequentialAnimationProperty sequentialAnimationProperty =
-                new SequentialAnimationProperty(this, 0, 1000);
+        AnimationProperty transitionProperty = new AnimationProperty(this, 0, 1000);
 
-        animatorInstance.setSequentialAnimationProperty(sequentialAnimationProperty);
+        animator.setTransitionProperty(transitionProperty);
 
-        animatorInstance.animate();
+        animator.animate();
     }
 }

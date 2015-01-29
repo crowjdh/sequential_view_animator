@@ -1,16 +1,18 @@
 package com.yooiistudios.sequentialanimationtest.ui.fragment;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialViewAnimator;
-import com.yooiistudios.sequentialanimationtest.ui.AnimationFactory;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.AnimateViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialAnimationProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.TransitionProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.AnimationAnimator;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.SequentialViewAnimator;
 import com.yooiistudios.sequentialanimationtest.ui.Animatable;
+import com.yooiistudios.sequentialanimationtest.ui.AnimationFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +23,21 @@ import java.util.List;
  * BaseFragment
  */
 public abstract class BaseFragment extends Fragment
-        implements AnimateViewProperty.AnimationListener,
-        SequentialAnimationProperty.AnimationSupplier,
+        implements ViewProperty.AnimationListener,
+        TransitionProperty.AnimationSupplier<Animation>,
         Animatable {
+    private SequentialViewAnimator mAnimator;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAnimator = new AnimationAnimator();
+    }
+
+    public SequentialViewAnimator getSequentialViewAnimator() {
+        return mAnimator;
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -31,13 +45,13 @@ public abstract class BaseFragment extends Fragment
     }
 
     @Override
-    public void onAnimationEnd(AnimateViewProperty property) {
+    public void onAnimationEnd(ViewProperty property) {
         Log.i(getClass().getSimpleName(), "Animation end. Index : " + property.getViewIndex());
     }
 
     @NonNull
     @Override
-    public List<Animation> onSupplyAnimationList() {
+    public List<Animation> onSupplyTransitionList() {
         Context context = getActivity().getApplicationContext();
         Animation fadeOutAnim = AnimationFactory.makeBottomFadeOutAnimation(context);
         Animation fadeInAnim = AnimationFactory.makeBottomFadeInAnimation(context);
@@ -51,6 +65,6 @@ public abstract class BaseFragment extends Fragment
 
     @Override
     public void stopAnimation() {
-        SequentialViewAnimator.getInstance().cancelAllAnimations();
+        getSequentialViewAnimator().cancelAllTransitions();
     }
 }

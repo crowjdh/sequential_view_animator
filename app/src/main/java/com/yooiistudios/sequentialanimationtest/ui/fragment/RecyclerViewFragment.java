@@ -10,9 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimationtest.R;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.AnimateViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialAnimationProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialViewAnimator;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.AnimationProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.AnimationAnimator;
 import com.yooiistudios.sequentialanimationtest.ui.SimpleAdapter;
 import com.yooiistudios.sequentialanimationtest.ui.recyclerview.DividerItemDecoration;
 
@@ -97,23 +97,22 @@ public class RecyclerViewFragment extends BaseFragment {
         int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
 
-        SequentialViewAnimator animatorInstance = SequentialViewAnimator.getInstance();
+        AnimationAnimator animator = (AnimationAnimator)getSequentialViewAnimator();
         for (int i = firstVisibleItemPosition; i <= lastVisibleItemPosition; i++) {
             View itemView = mLayoutManager.findViewByPosition(i);
-            AnimateViewProperty property =
-                    new AnimateViewProperty.Builder()
+            ViewProperty property =
+                    new ViewProperty.Builder()
                             .setView(itemView)
                             .setViewIndex(i)
                             .setAnimationListener(this)
                             .build();
 
-            animatorInstance.putAnimateViewPropertyAt(property, i);
+            animator.putAnimateViewPropertyAt(property, i);
         }
 
-        SequentialAnimationProperty sequentialAnimationProperty =
-                new SequentialAnimationProperty(this, 0, 1000);
-        animatorInstance.setSequentialAnimationProperty(sequentialAnimationProperty);
+        AnimationProperty transitionProperty = new AnimationProperty(this, 0, 1000);
+        animator.setTransitionProperty(transitionProperty);
 
-        animatorInstance.animate();
+        animator.animate();
     }
 }
