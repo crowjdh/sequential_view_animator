@@ -2,6 +2,7 @@ package com.yooiistudios.sequentialanimationtest.sequentialanimation;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.ViewCompat;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Animation;
@@ -53,14 +54,14 @@ public class SequentialViewAnimator {
 
     public void animate() {
         if (isReadyForAnimation()) {
-            cancelAll();
+            cancelAllAnimations();
             prepareForNewAnimationSequence();
             runSequentialAnimation();
         }
     }
 
     // TODO refactor
-    private void cancelAll() {
+    public void cancelAllAnimations() {
         mAnimationHandler.removeCallbacksAndMessages(null);
         for (int i = 0; i < mAnimateViewProperties.size(); i++) {
             int propertyIndex = mAnimateViewProperties.keyAt(i);
@@ -76,6 +77,7 @@ public class SequentialViewAnimator {
             // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
             int propertyIndex = mAnimateViewProperties.keyAt(i);
             AnimateViewProperty property = mAnimateViewProperties.get(propertyIndex);
+            setViewHasTransientState(property);
             requestAnimation(property);
         }
     }
@@ -99,26 +101,20 @@ public class SequentialViewAnimator {
     private void animate(AnimateViewProperty property) {
         Animation animation = getAnimationFromProperty(property);
 
-        if (isLastAnimation(property)) {
-            startLastAnimation(property, animation);
-        } else {
-            startAnimation(property, animation);
-        }
-        // TODO msg.obj에 property 변수가 계속 연결되어 있는지 생각해보자.
+        startAnimation(property, animation);
     }
 
-    private static void startAnimation(AnimateViewProperty property, Animation animation) {
-        // TODO transient!! 화면 회전시 뷰 재생성 막자!
-        //
+    private SequentialAnimationListener makeAnimationListener(AnimateViewProperty property) {
+        SequentialAnimationListener listener = new SequentialAnimationListener(property);
+        listener.setAnimatingLastAnimation(isLastAnimation(property));
+
+        return listener;
+    }
+
+    private void startAnimation(AnimateViewProperty property, Animation animation) {
+        animation.setAnimationListener(makeAnimationListener(property));
         View viewToAnimate = property.getView();
         viewToAnimate.startAnimation(animation);
-    }
-
-    private static void startLastAnimation(AnimateViewProperty property, Animation animation) {
-        AnimateViewPropertyAnimationListener listener =
-                new AnimateViewPropertyAnimationListener(property);
-        animation.setAnimationListener(listener);
-        startAnimation(property, animation);
     }
 
     private boolean isLastAnimation(AnimateViewProperty property) {
@@ -180,10 +176,11 @@ public class SequentialViewAnimator {
         }
     }
 
-    private static class AnimateViewPropertyAnimationListener extends AnimationListenerImpl {
+    private static class SequentialAnimationListener extends AnimationListenerImpl {
         private AnimateViewProperty mAnimateViewProperty;
+        private boolean mIsAnimatingLastAnimation;
 
-        public AnimateViewPropertyAnimationListener(AnimateViewProperty animateViewProperty) {
+        public SequentialAnimationListener(AnimateViewProperty animateViewProperty) {
             mAnimateViewProperty = animateViewProperty;
         }
 
@@ -191,16 +188,47 @@ public class SequentialViewAnimator {
             return mAnimateViewProperty;
         }
 
+        public boolean isAnimatingLastAnimation() {
+            return mIsAnimatingLastAnimation;
+        }
+
+        public void setAnimatingLastAnimation(boolean isAnimatingLastAnimation) {
+            mIsAnimatingLastAnimation = isAnimatingLastAnimation;
+        }
+
         @Override
         public final void onAnimationEnd(Animation animation) {
             super.onAnimationEnd(animation);
 
+            if (isAnimatingLastAnimation()) {
+                notifyOnAnimationEnd();
+            }
+        }
+
+        private void notifyOnAnimationEnd() {
             AnimateViewProperty.AnimationListener callback =
                     getAnimateViewProperty().getAnimationListener();
+
+            setViewNotHaveTransientState(getAnimateViewProperty());
 
             if (callback != null) {
                 callback.onAnimationEnd(getAnimateViewProperty());
             }
         }
+    }
+
+    // 어뎁터뷰가 스크롤될 경우 아이템뷰들을 재사용하므로 예상치 못한 뷰에서 애니메이션이 실행되는 문제가 있다.
+    // Android Developers 의 DevBytes: ListView Animations 를 참조,
+    // 해당 뷰를 재사용하지 않게 setHasTransientState 프로퍼티를 true 로 설정,
+    // 애니메이션이 끝난 후 다시 false 로 바꿔주는 방식을 사용했다.
+    // 링크 : http://youtu.be/8MIfSxgsHIs
+    private static void setViewHasTransientState(AnimateViewProperty property) {
+        ViewCompat.setHasTransientState(property.getView(), true);
+//        property.getView().setHasTransientState(true);
+    }
+
+    private static void setViewNotHaveTransientState(AnimateViewProperty property) {
+        ViewCompat.setHasTransientState(property.getView(), false);
+//        property.getView().setHasTransientState(false);
     }
 }

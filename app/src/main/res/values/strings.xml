@@ -4,4 +4,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_static">Static</string>
     <string name="action_recycler">RecyclerView</string>
+
+    <string name="animate">Animate</string>
 </resources>

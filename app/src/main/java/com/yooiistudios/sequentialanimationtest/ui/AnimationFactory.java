@@ -1,9 +1,12 @@
-package com.yooiistudios.sequentialanimationtest;
+package com.yooiistudios.sequentialanimationtest.ui;
 
 import android.content.Context;
 import android.os.Build;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+
+import com.yooiistudios.sequentialanimationtest.CubicBezierInterpolator;
+import com.yooiistudios.sequentialanimationtest.R;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.

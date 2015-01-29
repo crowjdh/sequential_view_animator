@@ -7,12 +7,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.yooiistudios.sequentialanimationtest.ui.fragment.BaseFragment;
 import com.yooiistudios.sequentialanimationtest.ui.fragment.RecyclerViewFragment;
 import com.yooiistudios.sequentialanimationtest.ui.fragment.StaticLayoutFragment;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity
+        implements View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String TAG_FRAGMENT_STATIC = "TAG_FRAGMENT_STATIC";
     private static final String TAG_FRAGMENT_RECYCLER = "TAG_FRAGMENT_RECYCLER";
@@ -27,6 +30,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        init(savedInstanceState);
+    }
+
+    private void init(Bundle savedInstanceState) {
+        findViewById(R.id.animate).setOnClickListener(this);
         initFragment(savedInstanceState);
     }
 
@@ -103,7 +111,7 @@ public class MainActivity extends ActionBarActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             removeFragments(transaction);
-            transaction.add(R.id.root, makeFragmentByTag(tag), tag);
+            transaction.replace(R.id.fragment_container, makeFragmentByTag(tag), tag);
             transaction.commit();
         }
     }
@@ -117,5 +125,16 @@ public class MainActivity extends ActionBarActivity {
             default:
                 return null;
         }
+    }
+
+    private BaseFragment getCurrentFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(getTagOfCurrentFragment());
+
+        return (fragment instanceof BaseFragment) ? (BaseFragment)fragment : null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        getCurrentFragment().startAnimation();
     }
 }

@@ -43,7 +43,7 @@ public class StaticLayoutFragment extends BaseFragment {
     }
 
     @Override
-    protected void animate() {
+    public void startAnimation() {
         AnimateViewProperty property0 =
                 new AnimateViewProperty.Builder()
                         .setView(mTarget0)

@@ -6,9 +6,11 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimationtest.AnimationFactory;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialViewAnimator;
+import com.yooiistudios.sequentialanimationtest.ui.AnimationFactory;
 import com.yooiistudios.sequentialanimationtest.sequentialanimation.AnimateViewProperty;
 import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialAnimationProperty;
+import com.yooiistudios.sequentialanimationtest.ui.Animatable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,15 @@ import java.util.List;
  * BaseFragment
  */
 public abstract class BaseFragment extends Fragment
-        implements AnimateViewProperty.AnimationListener, SequentialAnimationProperty.AnimationSupplier {
+        implements AnimateViewProperty.AnimationListener,
+        SequentialAnimationProperty.AnimationSupplier,
+        Animatable {
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        stopAnimation();
+    }
+
     @Override
     public void onAnimationEnd(AnimateViewProperty property) {
         Log.i(getClass().getSimpleName(), "Animation end. Index : " + property.getViewIndex());
@@ -39,5 +49,8 @@ public abstract class BaseFragment extends Fragment
         return animList;
     }
 
-    protected abstract void animate();
+    @Override
+    public void stopAnimation() {
+        SequentialViewAnimator.getInstance().cancelAllAnimations();
+    }
 }

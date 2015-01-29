@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimationtest.R;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.AnimateViewProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialAnimationProperty;
+import com.yooiistudios.sequentialanimationtest.sequentialanimation.SequentialViewAnimator;
 import com.yooiistudios.sequentialanimationtest.ui.SimpleAdapter;
 import com.yooiistudios.sequentialanimationtest.ui.recyclerview.DividerItemDecoration;
 
@@ -20,7 +23,8 @@ import com.yooiistudios.sequentialanimationtest.ui.recyclerview.DividerItemDecor
  */
 public class RecyclerViewFragment extends BaseFragment {
     private RecyclerView mRecycler;
-    private GridLayoutManager mGridLayoutManager;
+    private RecyclerView.Adapter mAdapter;
+    private GridLayoutManager mLayoutManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,19 +48,24 @@ public class RecyclerViewFragment extends BaseFragment {
 
     private void initRecyclerView() {
         initLayoutManager();
-        configLayoutSpan();
-        setAdapter();
+        initAdapter();
+        initItemDecoration();
 
+        configLayoutSpan();
+    }
+
+    private void initAdapter() {
+        mAdapter = new SimpleAdapter();
+        mRecycler.setAdapter(mAdapter);
+    }
+
+    private void initItemDecoration() {
         mRecycler.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
     }
 
-    private void setAdapter() {
-        mRecycler.setAdapter(new SimpleAdapter());
-    }
-
     private void initLayoutManager() {
-        mGridLayoutManager = new GridLayoutManager(getActivity(), 1);
-        mRecycler.setLayoutManager(mGridLayoutManager);
+        mLayoutManager = new GridLayoutManager(getActivity(), 1);
+        mRecycler.setLayoutManager(mLayoutManager);
     }
 
     private void configLayoutSpan() {
@@ -69,11 +78,11 @@ public class RecyclerViewFragment extends BaseFragment {
     }
 
     private void setLayoutSpanOnPortrait() {
-        mGridLayoutManager.setSpanCount(1);
+        mLayoutManager.setSpanCount(1);
     }
 
     private void setLayoutSpanOnLandscape() {
-        mGridLayoutManager.setSpanCount(2);
+        mLayoutManager.setSpanCount(2);
     }
 
     @Override
@@ -84,44 +93,27 @@ public class RecyclerViewFragment extends BaseFragment {
     }
 
     @Override
-    protected void animate() {
-//        AnimateViewProperty property0 =
-//                new AnimateViewProperty.Builder()
-//                        .setView(mTarget0)
-//                        .setViewIndex(0)
-//                        .setAnimationListener(this)
-//                        .build();
-//        AnimateViewProperty property1 =
-//                new AnimateViewProperty.Builder()
-//                        .setView(mTarget1)
-//                        .setViewIndex(1)
-//                        .setAnimationListener(this)
-//                        .build();
-//        AnimateViewProperty property2 =
-//                new AnimateViewProperty.Builder()
-//                        .setView(mTarget2)
-//                        .setViewIndex(2)
-//                        .setAnimationListener(this)
-//                        .build();
-//        AnimateViewProperty property3 =
-//                new AnimateViewProperty.Builder()
-//                        .setView(mTarget3)
-//                        .setViewIndex(3)
-//                        .setAnimationListener(this)
-//                        .build();
-//
-//        SequentialViewAnimator animatorInstance = SequentialViewAnimator.getInstance();
-//        animatorInstance.putAnimateViewPropertyAt(property0, 0);
-//        animatorInstance.putAnimateViewPropertyAt(property1, 1);
-//        animatorInstance.putAnimateViewPropertyAt(property2, 2);
-//        animatorInstance.putAnimateViewPropertyAt(property3, 3);
-//
-//        SequentialAnimationProperty sequentialAnimationProperty =
-//                new SequentialAnimationProperty(this, 0, 1000);
-//
-//        animatorInstance.setSequentialAnimationProperty(sequentialAnimationProperty);
-//
-//        animatorInstance.animate();
-    }
+    public void startAnimation() {
+        int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
+        int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
 
+        SequentialViewAnimator animatorInstance = SequentialViewAnimator.getInstance();
+        for (int i = firstVisibleItemPosition; i <= lastVisibleItemPosition; i++) {
+            View itemView = mLayoutManager.findViewByPosition(i);
+            AnimateViewProperty property =
+                    new AnimateViewProperty.Builder()
+                            .setView(itemView)
+                            .setViewIndex(i)
+                            .setAnimationListener(this)
+                            .build();
+
+            animatorInstance.putAnimateViewPropertyAt(property, i);
+        }
+
+        SequentialAnimationProperty sequentialAnimationProperty =
+                new SequentialAnimationProperty(this, 0, 1000);
+        animatorInstance.setSequentialAnimationProperty(sequentialAnimationProperty);
+
+        animatorInstance.animate();
+    }
 }
