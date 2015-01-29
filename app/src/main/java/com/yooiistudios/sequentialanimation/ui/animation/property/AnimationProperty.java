@@ -1,10 +1,8 @@
-package com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty;
+package com.yooiistudios.sequentialanimation.ui.animation.property;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.animation.Animation;
-
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
 
 import java.util.List;
 

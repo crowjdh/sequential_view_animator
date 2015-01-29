@@ -1,11 +1,11 @@
-package com.yooiistudios.sequentialanimationtest.sequentialanimation.animator;
+package com.yooiistudios.sequentialanimation.ui.animation.animator;
 
 import android.os.Handler;
 import android.os.Message;
 import android.util.SparseArray;
 
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.TransitionProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.property.TransitionProperty;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -16,13 +16,13 @@ import java.util.List;
  * SequentialViewAnimator
  *  순차적으로 뷰들을 animating 하는 클래스
  */
-public abstract class SequentialViewAnimator<T extends TransitionProperty> {
+public abstract class SerialAnimator<T extends TransitionProperty> {
     private final SparseArray<ViewProperty> mViewProperties;
     private T mTransitionProperty;
     private TransitionHandler mTransitionHandler;
     private long mStartTimeInMilli;
 
-    protected SequentialViewAnimator() {
+    protected SerialAnimator() {
         mViewProperties = new SparseArray<>();
         mTransitionHandler = new TransitionHandler(this);
     }
@@ -101,9 +101,9 @@ public abstract class SequentialViewAnimator<T extends TransitionProperty> {
     }
 
     private static class TransitionHandler extends Handler {
-        private WeakReference<SequentialViewAnimator> mAnimatorWeakReference;
+        private WeakReference<SerialAnimator> mAnimatorWeakReference;
 
-        public TransitionHandler(SequentialViewAnimator animator) {
+        public TransitionHandler(SerialAnimator animator) {
             mAnimatorWeakReference = new WeakReference<>(animator);
         }
 
@@ -117,7 +117,7 @@ public abstract class SequentialViewAnimator<T extends TransitionProperty> {
             boolean animate = property.getView() != null;
 
             if (animate) {
-                SequentialViewAnimator animator = mAnimatorWeakReference.get();
+                SerialAnimator animator = mAnimatorWeakReference.get();
 
                 animator.transit(property);
                 animator.requestNextTransition(property);

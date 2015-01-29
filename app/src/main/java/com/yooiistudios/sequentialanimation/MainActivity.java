@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest;
+package com.yooiistudios.sequentialanimation;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -9,9 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.yooiistudios.sequentialanimationtest.ui.fragment.BaseFragment;
-import com.yooiistudios.sequentialanimationtest.ui.fragment.RecyclerViewFragment;
-import com.yooiistudios.sequentialanimationtest.ui.fragment.StaticLayoutFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.BaseFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.RecyclerViewFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.StaticLayoutFragment;
 
 
 public class MainActivity extends ActionBarActivity

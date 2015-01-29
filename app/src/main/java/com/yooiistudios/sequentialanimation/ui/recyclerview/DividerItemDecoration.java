@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest.ui.recyclerview;
+package com.yooiistudios.sequentialanimation.ui.recyclerview;
 
 import android.content.Context;
 import android.content.res.TypedArray;

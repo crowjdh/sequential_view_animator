@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest.ui.fragment;
+package com.yooiistudios.sequentialanimation.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,12 +7,12 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.TransitionProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.AnimationAnimator;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.SequentialViewAnimator;
-import com.yooiistudios.sequentialanimationtest.ui.Animatable;
-import com.yooiistudios.sequentialanimationtest.ui.AnimationFactory;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
+import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.property.TransitionProperty;
+import com.yooiistudios.sequentialanimation.ui.Animatable;
+import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +26,15 @@ public abstract class BaseFragment extends Fragment
         implements ViewProperty.AnimationListener,
         TransitionProperty.AnimationSupplier<Animation>,
         Animatable {
-    private SequentialViewAnimator mAnimator;
+    private SerialAnimator mAnimator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAnimator = new AnimationAnimator();
+        mAnimator = new SerialAnimationAnimator();
     }
 
-    public SequentialViewAnimator getSequentialViewAnimator() {
+    public SerialAnimator getSequentialViewAnimator() {
         return mAnimator;
     }
 

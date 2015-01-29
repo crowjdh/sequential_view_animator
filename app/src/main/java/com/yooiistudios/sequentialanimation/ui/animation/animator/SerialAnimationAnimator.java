@@ -1,12 +1,12 @@
-package com.yooiistudios.sequentialanimationtest.sequentialanimation.animator;
+package com.yooiistudios.sequentialanimation.ui.animation.animator;
 
 import android.view.View;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimationtest.ui.AnimationListenerImpl;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewUtils;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.AnimationProperty;
+import com.yooiistudios.sequentialanimation.ui.AnimationListenerImpl;
+import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
+import com.yooiistudios.sequentialanimation.ui.animation.property.AnimationProperty;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * AnimationAnimator
  *  android.view.animation.Animation 객체를 사용하는 애니메이터
  */
-public class AnimationAnimator extends SequentialViewAnimator<AnimationProperty> {
+public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty> {
 
     @Override
     protected void transit(ViewProperty property) {
@@ -28,7 +28,7 @@ public class AnimationAnimator extends SequentialViewAnimator<AnimationProperty>
 
     @Override
     protected void beforeRequestTransition(ViewProperty property) {
-        ViewUtils.setViewHasTransientState(property);
+        ViewTransientUtils.setState(property);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class AnimationAnimator extends SequentialViewAnimator<AnimationProperty>
             ViewProperty.AnimationListener callback =
                     getViewProperty().getAnimationListener();
 
-            ViewUtils.setViewNotHaveTransientState(getViewProperty());
+            ViewTransientUtils.clearState(getViewProperty());
 
             if (callback != null) {
                 callback.onAnimationEnd(getViewProperty());

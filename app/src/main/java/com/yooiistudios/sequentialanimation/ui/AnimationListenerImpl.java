@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest.ui;
+package com.yooiistudios.sequentialanimation.ui;
 
 import android.view.animation.Animation;
 

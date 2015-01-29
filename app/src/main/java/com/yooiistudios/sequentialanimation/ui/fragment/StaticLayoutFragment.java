@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest.ui.fragment;
+package com.yooiistudios.sequentialanimation.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -6,10 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.yooiistudios.sequentialanimationtest.R;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.AnimationProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.AnimationAnimator;
+import com.yooiistudios.sequentialanimation.R;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
+import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.property.AnimationProperty;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
@@ -67,7 +67,7 @@ public class StaticLayoutFragment extends BaseFragment {
                         .setAnimationListener(this)
                         .build();
 
-        AnimationAnimator animator = (AnimationAnimator)getSequentialViewAnimator();
+        SerialAnimationAnimator animator = (SerialAnimationAnimator)getSequentialViewAnimator();
         animator.putAnimateViewPropertyAt(property0, 0);
         animator.putAnimateViewPropertyAt(property1, 1);
         animator.putAnimateViewPropertyAt(property2, 2);

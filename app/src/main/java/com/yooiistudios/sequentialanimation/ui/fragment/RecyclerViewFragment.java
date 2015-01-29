@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest.ui.fragment;
+package com.yooiistudios.sequentialanimation.ui.fragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,12 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.yooiistudios.sequentialanimationtest.R;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.ViewProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animationproperty.AnimationProperty;
-import com.yooiistudios.sequentialanimationtest.sequentialanimation.animator.AnimationAnimator;
-import com.yooiistudios.sequentialanimationtest.ui.SimpleAdapter;
-import com.yooiistudios.sequentialanimationtest.ui.recyclerview.DividerItemDecoration;
+import com.yooiistudios.sequentialanimation.R;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
+import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.sequentialanimation.ui.animation.property.AnimationProperty;
+import com.yooiistudios.sequentialanimation.ui.SimpleAdapter;
+import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoration;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
@@ -97,7 +97,7 @@ public class RecyclerViewFragment extends BaseFragment {
         int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
 
-        AnimationAnimator animator = (AnimationAnimator)getSequentialViewAnimator();
+        SerialAnimationAnimator animator = (SerialAnimationAnimator)getSequentialViewAnimator();
         for (int i = firstVisibleItemPosition; i <= lastVisibleItemPosition; i++) {
             View itemView = mLayoutManager.findViewByPosition(i);
             ViewProperty property =

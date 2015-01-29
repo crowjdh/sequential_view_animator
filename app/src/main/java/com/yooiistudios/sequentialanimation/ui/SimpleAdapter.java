@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest.ui;
+package com.yooiistudios.sequentialanimation.ui;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.yooiistudios.sequentialanimationtest.R;
+import com.yooiistudios.sequentialanimation.R;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.

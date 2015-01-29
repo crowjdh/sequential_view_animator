@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimationtest;
+package com.yooiistudios.sequentialanimation;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
