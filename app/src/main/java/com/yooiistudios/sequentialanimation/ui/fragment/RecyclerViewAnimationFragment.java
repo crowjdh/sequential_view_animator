@@ -20,7 +20,7 @@ import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoratio
  *
  * RecyclerViewFragment
  */
-public class RecyclerViewFragment extends BaseFragment {
+public class RecyclerViewAnimationFragment extends AnimationFragment {
     private RecyclerView mRecycler;
     private RecyclerView.Adapter mAdapter;
     private GridLayoutManager mLayoutManager;

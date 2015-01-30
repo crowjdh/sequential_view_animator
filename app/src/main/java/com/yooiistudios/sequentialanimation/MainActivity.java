@@ -10,16 +10,24 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.fragment.BaseFragment;
-import com.yooiistudios.sequentialanimation.ui.fragment.RecyclerViewFragment;
-import com.yooiistudios.sequentialanimation.ui.fragment.StaticLayoutFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.RecyclerViewAnimationFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.StaticAnimationFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.StaticValueAnimatorFragment;
 
 
 public class MainActivity extends ActionBarActivity
         implements View.OnClickListener {
-    private static final String TAG_FRAGMENT_STATIC = "TAG_FRAGMENT_STATIC";
-    private static final String TAG_FRAGMENT_RECYCLER = "TAG_FRAGMENT_RECYCLER";
-    private static final String[] TAG_LIST = { TAG_FRAGMENT_STATIC, TAG_FRAGMENT_RECYCLER };
-    private static final String DEFAULT_TAG_FRAGMENT = TAG_FRAGMENT_RECYCLER;
+    private static final String TAG_FRAGMENT_STATIC_ANIMATION = "TAG_FRAGMENT_STATIC_ANIMATION";
+    private static final String TAG_FRAGMENT_RECYCLER_ANIMATION = "TAG_FRAGMENT_RECYCLER_ANIMATION";
+    private static final String TAG_FRAGMENT_STATIC_VALUE_ANIMATOR = "TAG_FRAGMENT_STATIC_VALUE_ANIMATOR";
+    private static final String TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR = "TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR";
+    private static final String[] TAG_LIST = {
+            TAG_FRAGMENT_STATIC_ANIMATION,
+            TAG_FRAGMENT_RECYCLER_ANIMATION,
+            TAG_FRAGMENT_STATIC_VALUE_ANIMATOR,
+            TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR
+    };
+    private static final String DEFAULT_TAG_FRAGMENT = TAG_FRAGMENT_STATIC_VALUE_ANIMATOR;
 
     private static final String STATE_KEY_FRAGMENT = "STATE_KEY_FRAGMENT";
 
@@ -69,11 +77,13 @@ public class MainActivity extends ActionBarActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_static:
-                showStaticFragment();
+            case R.id.action_anim_static:
+                showAnimationStaticFragment();
                 return true;
-            case R.id.action_recycler:
-                showRecyclerFragment();
+            case R.id.action_anim_recycler:
+                showAnimationRecyclerFragment();
+            case R.id.action_value_static:
+                showValueAnimatorStaticFragment();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -88,12 +98,20 @@ public class MainActivity extends ActionBarActivity
         return null;
     }
 
-    private void showStaticFragment() {
-        showFragmentByTag(TAG_FRAGMENT_STATIC);
+    private void showAnimationStaticFragment() {
+        showFragmentByTag(TAG_FRAGMENT_STATIC_ANIMATION);
     }
 
-    private void showRecyclerFragment() {
-        showFragmentByTag(TAG_FRAGMENT_RECYCLER);
+    private void showAnimationRecyclerFragment() {
+        showFragmentByTag(TAG_FRAGMENT_RECYCLER_ANIMATION);
+    }
+
+    private void showValueAnimatorStaticFragment() {
+        showFragmentByTag(TAG_FRAGMENT_STATIC_VALUE_ANIMATOR);
+    }
+
+    private void showValueAnimatorRecyclerFragment() {
+        showFragmentByTag(TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR);
     }
 
     private void removeFragments(FragmentTransaction transaction) {
@@ -117,10 +135,14 @@ public class MainActivity extends ActionBarActivity
 
     private Fragment makeFragmentByTag(String tag) {
         switch (tag) {
-            case TAG_FRAGMENT_STATIC:
-                return new StaticLayoutFragment();
-            case TAG_FRAGMENT_RECYCLER:
-                return new RecyclerViewFragment();
+            case TAG_FRAGMENT_STATIC_ANIMATION:
+                return new StaticAnimationFragment();
+            case TAG_FRAGMENT_RECYCLER_ANIMATION:
+                return new RecyclerViewAnimationFragment();
+            case TAG_FRAGMENT_STATIC_VALUE_ANIMATOR:
+                return new StaticValueAnimatorFragment();
+            case TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR:
+//                return new RecyclerViewAnimationFragment();
             default:
                 return null;
         }
@@ -133,7 +155,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
         getCurrentFragment().startAnimation();
     }
 }

@@ -1,21 +1,27 @@
 package com.yooiistudios.sequentialanimation.ui.fragment;
 
+import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimation.R;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
+import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
  *
  * StaticLayoutFragment
  */
-public class StaticLayoutFragment extends BaseFragment {
+public class StaticValueAnimatorFragment extends ValueAnimatorFragment {
     private View mTarget0;
     private View mTarget1;
     private View mTarget2;
@@ -37,6 +43,37 @@ public class StaticLayoutFragment extends BaseFragment {
             mTarget2 = rootView.findViewById(R.id.target2);
             mTarget3 = rootView.findViewById(R.id.target3);
         }
+    }
+
+    @NonNull
+    @Override
+    public List<ValueAnimator> onSupplyTransitionList(final View targetView) {
+        ValueAnimator fadeOutAnimator = AnimationFactory.makeFadeOutAnimator();
+//        ValueAnimator animator = valueAnimators.get(property.getTransitionIndex());
+        fadeOutAnimator.setTarget(targetView);
+        fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float alpha = (Float) animation.getAnimatedValue("alpha");
+                targetView.setAlpha(alpha);
+            }
+        });
+
+        ValueAnimator fadeInAnimator = AnimationFactory.makeFadeInAnimator();
+        fadeInAnimator.setTarget(targetView);
+        fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float alpha = (Float)animation.getAnimatedValue("alpha");
+                targetView.setAlpha(alpha);
+            }
+        });
+
+        List<ValueAnimator> animators = new ArrayList<>();
+        animators.add(fadeOutAnimator);
+        animators.add(fadeInAnimator);
+
+        return animators;
     }
 
     @Override
@@ -66,13 +103,15 @@ public class StaticLayoutFragment extends BaseFragment {
                         .setAnimationListener(this)
                         .build();
 
-        SerialAnimationAnimator animator = (SerialAnimationAnimator)getSequentialViewAnimator();
+//        ObjectAnimator.ofArgb().setTarget();
+        SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
         animator.putAnimateViewPropertyAt(property0, 0);
         animator.putAnimateViewPropertyAt(property1, 1);
         animator.putAnimateViewPropertyAt(property2, 2);
         animator.putAnimateViewPropertyAt(property3, 3);
 
-        SerialAnimationAnimator.AnimationProperty transitionProperty = new SerialAnimationAnimator.AnimationProperty(this, 0, 1000);
+        SerialValueAnimator.ValueAnimatorProperty transitionProperty
+                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 1000);
 
         animator.setTransitionProperty(transitionProperty);
 

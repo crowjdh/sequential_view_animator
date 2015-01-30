@@ -2,12 +2,20 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
-    <item android:id="@+id/action_static"
-          android:title="@string/action_static"
+    <item android:id="@+id/action_value_static"
+          android:title="@string/action_value_static"
           android:orderInCategory="100"
-          app:showAsAction="always"/>
-    <item android:id="@+id/action_recycler"
-          android:title="@string/action_recycler"
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_value_recycler"
+          android:title="@string/action_value_recycler"
           android:orderInCategory="200"
-          app:showAsAction="always"/>
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_anim_static"
+          android:title="@string/action_anim_static"
+          android:orderInCategory="300"
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_anim_recycler"
+          android:title="@string/action_anim_recycler"
+          android:orderInCategory="400"
+          app:showAsAction="ifRoom"/>
 </menu>

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
+import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
@@ -16,7 +17,10 @@ import java.util.List;
  * SerialAnimator
  *  순차적으로 뷰들을 animating 하는 클래스
  */
-public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty> {
+public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty,
+        S extends SerialAnimator.TransitionListener> {
+    protected interface TransitionListener { }
+
     private final SparseArray<ViewProperty> mViewProperties;
     private T mTransitionProperty;
     private TransitionHandler mTransitionHandler;
@@ -74,13 +78,17 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         }
     }
 
-    protected abstract void transit(ViewProperty property);
+    private void _transit(ViewProperty property) {
+        transit(property, makeTransitionListener(property));
+    }
+
+    protected abstract void transit(ViewProperty property, S transitionListener);
 
     // TODO 리스너로 뺄 수 있으면 빼자
     protected abstract void beforeRequestTransition(ViewProperty property);
 
     protected boolean isLastTransition(ViewProperty property) {
-        List transitions = getTransitionProperty().getTransitions();
+        List transitions = getTransitionProperty().getTransitions(property.getView());
         return property.getTransitionIndex() == transitions.size() - 1;
     }
 
@@ -95,6 +103,8 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     protected T getTransitionProperty() {
         return mTransitionProperty;
     }
+
+    protected abstract S makeTransitionListener(ViewProperty property);
 
     protected SparseArray<ViewProperty> getViewProperties() {
         return mViewProperties;
@@ -119,7 +129,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             if (animate) {
                 SerialAnimator animator = mAnimatorWeakReference.get();
 
-                animator.transit(property);
+                animator._transit(property);
                 animator.requestNextTransition(property);
             }
         }
@@ -137,20 +147,20 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     }
 
     public static abstract class TransitionProperty<T> {
-        public interface AnimationSupplier<T> {
-            public @NonNull List<T> onSupplyTransitionList();
+        public interface TransitionSupplier<T> {
+            public @NonNull List<T> onSupplyTransitionList(View targetView);
         }
 
-        private AnimationSupplier<T> mAnimationSupplier;
+        private TransitionSupplier<T> mTransitionSupplier;
         private long mInitialDelayInMillisec;
         private long mIntervalInMillisec;
 
-        // TODO factory로 만들어야 하나?
-        public TransitionProperty(AnimationSupplier<T> animationSupplier,
+        // DOUBT factory 로 만들어야 하나?
+        public TransitionProperty(TransitionSupplier<T> transitionSupplier,
                                   long initialDelayInMillisec, long intervalInMillisec) {
             throwIfParametersAreInvalid(initialDelayInMillisec, intervalInMillisec);
 
-            mAnimationSupplier = animationSupplier;
+            mTransitionSupplier = transitionSupplier;
             mInitialDelayInMillisec = initialDelayInMillisec;
             mIntervalInMillisec = intervalInMillisec;
         }
@@ -162,8 +172,8 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             }
         }
 
-        protected AnimationSupplier<T> getAnimationSupplier() {
-            return mAnimationSupplier;
+        protected TransitionSupplier<T> getTransitionSupplier() {
+            return mTransitionSupplier;
         }
 
         public long getInitialDelayInMillisec() {
@@ -174,14 +184,26 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             return mIntervalInMillisec;
         }
 
-        public List<T> getTransitions() {
-            return mAnimationSupplier.onSupplyTransitionList();
+        public List<T> getTransitions(View targetView) {
+            return mTransitionSupplier.onSupplyTransitionList(targetView);
         }
 
-        public abstract long getDelay(ViewProperty property);
+        protected final long getDelay(ViewProperty property) {
+            long delayBetweenTransitions = getDelayBeforeTransitions(property);
+            long delay = getInitialDelayInMillisec() + delayBetweenTransitions;
 
-        protected abstract long getDelayBetweenViews(ViewProperty property);
+            if (property.getTransitionIndex() == 0) {
+                long delayBetweenViews = getDelayBetweenViews(property);
+                delay += delayBetweenViews;
+            }
 
-        protected abstract long getDelayBetweenAnimations(ViewProperty property);
+            return delay;
+        }
+
+        protected final long getDelayBetweenViews(ViewProperty property) {
+            return getIntervalInMillisec() * property.getViewIndex();
+        }
+
+        protected abstract long getDelayBeforeTransitions(ViewProperty property);
     }
 }

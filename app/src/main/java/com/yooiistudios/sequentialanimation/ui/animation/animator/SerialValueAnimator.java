@@ -1,5 +1,6 @@
 package com.yooiistudios.sequentialanimation.ui.animation.animator;
 
+import android.animation.ValueAnimator;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.Animation;
@@ -10,23 +11,24 @@ import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
 import java.util.List;
 
-import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator.AnimationProperty;
+import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator.ValueAnimatorProperty;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
  *
- * SerialAnimationAnimator
+ * SerialValueAnimator
  *  android.view.animation.Animation 객체를 사용하는 애니메이터
  */
-public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
-        SerialAnimationAnimator.AnimationTransitionListener> {
+public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
+        SerialValueAnimator.ValueTransitionListener> {
 
     @Override
-    protected void transit(ViewProperty property, AnimationTransitionListener transitionListener) {
-        List<Animation> animations = getTransitionProperty().getTransitions(property.getView());
-        Animation animation = animations.get(property.getTransitionIndex());
+    protected void transit(ViewProperty property, ValueTransitionListener transitionListener) {
+        List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions(property.getView());
+        ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionIndex());
 
-        startAnimation(property, animation);
+        // XXX 테스트 안됨
+        valueAnimator.start();
     }
 
     @Override
@@ -37,6 +39,13 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
     @Override
     public void cancelAllTransitions() {
         super.cancelAllTransitions();
+//        List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions();
+//        for (ValueAnimator valueAnimator : valueAnimators) {
+//            // XXX 테스트 안됨
+//            valueAnimator.cancel();
+//            valueAnimator.end();
+//        }
+
         for (int i = 0; i < getViewProperties().size(); i++) {
             int propertyIndex = getViewProperties().keyAt(i);
             ViewProperty property = getViewProperties().get(propertyIndex);
@@ -45,27 +54,20 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
         }
     }
 
-    private void startAnimation(ViewProperty property, Animation animation) {
-//        animation.setAnimationListener(makeTransitionListener(property));
-        View viewToAnimate = property.getView();
-        viewToAnimate.startAnimation(animation);
-    }
-
     @Override
-    protected AnimationTransitionListener makeTransitionListener(ViewProperty property) {
-        AnimationTransitionListener listener = new AnimationTransitionListener(property);
+    protected ValueTransitionListener makeTransitionListener(ViewProperty property) {
+        ValueTransitionListener listener = new ValueTransitionListener(property);
         // FIXME 아래 라인 copy & paste 임. super 로 빼야 할듯
         listener.setIsLastTransition(isLastTransition(property));
 
         return listener;
     }
-
-    protected static class AnimationTransitionListener extends AnimationListenerImpl
+    protected static class ValueTransitionListener extends AnimationListenerImpl
             implements SerialAnimator.TransitionListener {
         private ViewProperty mViewProperty;
         private boolean mIsLastTransition;
 
-        public AnimationTransitionListener(ViewProperty viewProperty) {
+        public ValueTransitionListener(ViewProperty viewProperty) {
             mViewProperty = viewProperty;
         }
 
@@ -102,8 +104,8 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
         }
     }
 
-    public static class AnimationProperty extends SerialAnimator.TransitionProperty<Animation> {
-        public AnimationProperty(@NonNull TransitionSupplier<Animation> transitionSupplier,
+    public static class ValueAnimatorProperty extends SerialAnimator.TransitionProperty<ValueAnimator> {
+        public ValueAnimatorProperty(@NonNull TransitionSupplier<ValueAnimator> transitionSupplier,
                                  long initialDelayInMillisec, long intervalInMillisec) {
             super(transitionSupplier, initialDelayInMillisec, intervalInMillisec);
         }

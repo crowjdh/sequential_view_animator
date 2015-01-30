@@ -2,8 +2,10 @@
     <string name="app_name">SequentialAnimationTest</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_static">Static</string>
-    <string name="action_recycler">RecyclerView</string>
+    <string name="action_anim_static">Static.A</string>
+    <string name="action_anim_recycler">RecyclerView.A</string>
+    <string name="action_value_static">Static.V</string>
+    <string name="action_value_recycler">RecyclerView.V</string>
 
     <string name="animate">Animate</string>
 </resources>
