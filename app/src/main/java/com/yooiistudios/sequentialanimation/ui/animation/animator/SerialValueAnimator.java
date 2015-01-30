@@ -9,7 +9,9 @@ import com.yooiistudios.sequentialanimation.ui.AnimationListenerImpl;
 import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator.ValueAnimatorProperty;
 
@@ -21,14 +23,19 @@ import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialV
  */
 public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         SerialValueAnimator.ValueTransitionListener> {
+    private Map<ViewProperty, ValueAnimator> mValueAnimators;
+
+    public SerialValueAnimator() {
+        mValueAnimators = new HashMap<>();
+    }
 
     @Override
     protected void transit(ViewProperty property, ValueTransitionListener transitionListener) {
         List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions(property.getView());
         ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionIndex());
-
-        // XXX 테스트 안됨
         valueAnimator.start();
+
+        mValueAnimators.put(property, valueAnimator);
     }
 
     @Override
@@ -39,18 +46,17 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     @Override
     public void cancelAllTransitions() {
         super.cancelAllTransitions();
-//        List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions();
-//        for (ValueAnimator valueAnimator : valueAnimators) {
-//            // XXX 테스트 안됨
+        for (Map.Entry<ViewProperty, ValueAnimator> entry : mValueAnimators.entrySet()) {
+            // XXX 테스트 안됨
+            ViewProperty viewProperty = entry.getKey();
+            ValueAnimator animator = entry.getValue();
+            animator.cancel();
+
+            List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions(viewProperty.getView());
+            ValueAnimator valueAnimator = valueAnimators.get(0);
+
 //            valueAnimator.cancel();
-//            valueAnimator.end();
-//        }
-
-        for (int i = 0; i < getViewProperties().size(); i++) {
-            int propertyIndex = getViewProperties().keyAt(i);
-            ViewProperty property = getViewProperties().get(propertyIndex);
-
-            property.getView().clearAnimation();
+            valueAnimator.setCurrentPlayTime(0);
         }
     }
 
