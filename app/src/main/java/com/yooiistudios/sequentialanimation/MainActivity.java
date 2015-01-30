@@ -84,6 +84,8 @@ public class MainActivity extends ActionBarActivity
                 showAnimationRecyclerFragment();
             case R.id.action_value_static:
                 showValueAnimatorStaticFragment();
+            case R.id.action_value_recycler:
+                showValueAnimatorRecyclerFragment();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -142,7 +144,7 @@ public class MainActivity extends ActionBarActivity
             case TAG_FRAGMENT_STATIC_VALUE_ANIMATOR:
                 return new StaticValueAnimatorFragment();
             case TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR:
-//                return new RecyclerViewAnimationFragment();
+                return new RecyclerViewAnimationFragment();
             default:
                 return null;
         }
