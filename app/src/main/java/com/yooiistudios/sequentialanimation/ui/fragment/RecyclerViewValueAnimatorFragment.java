@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.yooiistudios.sequentialanimation.R;
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
 import com.yooiistudios.sequentialanimation.ui.SimpleAdapter;
+import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoration;
@@ -26,9 +27,12 @@ import java.util.List;
  *
  * RecyclerViewFragment
  */
-public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment {
+public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
+        implements SimpleAdapter.OnBindViewHolderListener {
+    private static final String TAG = RecyclerViewValueAnimatorFragment.class.getSimpleName();
+
     private RecyclerView mRecycler;
-    private RecyclerView.Adapter mAdapter;
+    private SimpleAdapter mAdapter;
     private GridLayoutManager mLayoutManager;
 
     @Override
@@ -61,6 +65,7 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment {
 
     private void initAdapter() {
         mAdapter = new SimpleAdapter();
+        mAdapter.setOnBindViewHolderListener(this);
         mRecycler.setAdapter(mAdapter);
     }
 
@@ -121,35 +126,60 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment {
             }
         });
 
+        ValueAnimator fadeOutAnimator2 = AnimationFactory.makeFadeOutAnimator();
+//        ValueAnimator animator = valueAnimators.get(property.getTransitionIndex());
+        fadeOutAnimator2.setTarget(targetView);
+        fadeOutAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float alpha = (Float) animation.getAnimatedValue("alpha");
+                targetView.setAlpha(alpha);
+            }
+        });
+
+        ValueAnimator fadeInAnimator2 = AnimationFactory.makeFadeInAnimator();
+        fadeInAnimator2.setTarget(targetView);
+        fadeInAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float alpha = (Float)animation.getAnimatedValue("alpha");
+                targetView.setAlpha(alpha);
+            }
+        });
+
         List<ValueAnimator> animators = new ArrayList<>();
         animators.add(fadeOutAnimator);
         animators.add(fadeInAnimator);
+        animators.add(fadeOutAnimator2);
+        animators.add(fadeInAnimator2);
 
         return animators;
     }
 
     @Override
     public void startAnimation() {
-        int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
-        int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
+//        int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
+//        int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
 
         SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
-        for (int i = firstVisibleItemPosition; i <= lastVisibleItemPosition; i++) {
-            View itemView = mLayoutManager.findViewByPosition(i);
-            ViewProperty property =
-                    new ViewProperty.Builder()
-                            .setView(itemView)
-                            .setViewIndex(i)
-                            .setAnimationListener(this)
-                            .build();
-
-            animator.putAnimateViewPropertyAt(property, i);
-        }
 
         SerialValueAnimator.ValueAnimatorProperty transitionProperty
-                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 1000);
+                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 300);
         animator.setTransitionProperty(transitionProperty);
 
         animator.animate();
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
+        SerialAnimator animator = getSequentialViewAnimator();
+
+        ViewProperty property =
+                new ViewProperty.Builder()
+                        .setView(viewHolder.itemView)
+                        .setViewIndex(i)
+                        .setAnimationListener(this)
+                        .build();
+        animator.putAnimateViewPropertyAt(property, i);
     }
 }

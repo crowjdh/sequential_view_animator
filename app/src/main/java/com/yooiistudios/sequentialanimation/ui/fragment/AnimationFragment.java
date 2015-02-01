@@ -29,10 +29,14 @@ public abstract class AnimationFragment extends BaseFragment<Animation, SerialAn
         Context context = getActivity().getApplicationContext();
         Animation fadeOutAnim = AnimationFactory.makeBottomFadeOutAnimation(context);
         Animation fadeInAnim = AnimationFactory.makeBottomFadeInAnimation(context);
+        Animation fadeOutAnim2 = AnimationFactory.makeBottomFadeOutAnimation(context);
+        Animation fadeInAnim2 = AnimationFactory.makeBottomFadeInAnimation(context);
 
         ArrayList<Animation> animList = new ArrayList<>();
         animList.add(fadeOutAnim);
         animList.add(fadeInAnim);
+        animList.add(fadeOutAnim2);
+        animList.add(fadeInAnim2);
 
         return animList;
     }

@@ -53,7 +53,7 @@ public class AnimationFactory {
         PropertyValuesHolder holder = PropertyValuesHolder.ofFloat("alpha", 0.0f, 1.0f);
         Interpolator interpolator = INTERPOLATOR;
         ValueAnimator animator = ValueAnimator.ofPropertyValuesHolder(holder);
-        animator.setDuration(1000);
+        animator.setDuration(300);
         animator.setInterpolator(interpolator);
 
         return animator;
@@ -63,7 +63,7 @@ public class AnimationFactory {
         PropertyValuesHolder holder = PropertyValuesHolder.ofFloat("alpha", 1.0f, 0.0f);
         Interpolator interpolator = INTERPOLATOR;
         ValueAnimator animator = ValueAnimator.ofPropertyValuesHolder(holder);
-        animator.setDuration(1000);
+        animator.setDuration(300);
         animator.setInterpolator(interpolator);
 
         return animator;

@@ -25,6 +25,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     private T mTransitionProperty;
     private TransitionHandler mTransitionHandler;
     private long mStartTimeInMilli;
+    private boolean mIsAnimating;
 
     protected SerialAnimator() {
         mViewProperties = new SparseArray<>();
@@ -79,7 +80,8 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     }
 
     private void _transit(ViewProperty property) {
-        transit(property, makeTransitionListener(property));
+        S listener = makeTransitionListener(property);
+        transit(property, listener);
     }
 
     protected abstract void transit(ViewProperty property, S transitionListener);
@@ -92,12 +94,37 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         return property.getTransitionIndex() == transitions.size() - 1;
     }
 
-    private boolean isReadyForTransition() {
+    protected boolean isReadyForTransition() {
         return mViewProperties.size() > 0 && mTransitionProperty != null;
     }
 
     private void prepareForNewTransitionSequence() {
         mStartTimeInMilli = System.currentTimeMillis();
+        mIsAnimating = true;
+
+        int viewCount = mViewProperties.size();
+        for (int i = 0; i < viewCount; i++) {
+            // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
+            int propertyIndex = mViewProperties.keyAt(i);
+            ViewProperty viewProperty = mViewProperties.get(propertyIndex);
+            viewProperty.resetTransitionIndex();
+        }
+    }
+
+    protected void onAnimationEnd() {
+        mIsAnimating = false;
+    }
+
+    protected boolean isAnimating() {
+        return mIsAnimating;
+    }
+
+    protected void setAnimating(boolean isAnimating) {
+        mIsAnimating = isAnimating;
+    }
+
+    protected long getStartTimeInMilli() {
+        return mStartTimeInMilli;
     }
 
     protected T getTransitionProperty() {
@@ -189,7 +216,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         }
 
         protected final long getDelay(ViewProperty property) {
-            long delayBetweenTransitions = getDelayBeforeTransitions(property);
+            long delayBetweenTransitions = getDelayBetweenTransitions(property);
             long delay = getInitialDelayInMillisec() + delayBetweenTransitions;
 
             if (property.getTransitionIndex() == 0) {
@@ -204,6 +231,6 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             return getIntervalInMillisec() * property.getViewIndex();
         }
 
-        protected abstract long getDelayBeforeTransitions(ViewProperty property);
+        protected abstract long getDelayBetweenTransitions(ViewProperty property);
     }
 }

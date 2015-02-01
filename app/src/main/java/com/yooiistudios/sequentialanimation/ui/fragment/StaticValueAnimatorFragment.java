@@ -69,9 +69,32 @@ public class StaticValueAnimatorFragment extends ValueAnimatorFragment {
             }
         });
 
+        ValueAnimator fadeOutAnimator2 = AnimationFactory.makeFadeOutAnimator();
+//        ValueAnimator animator = valueAnimators.get(property.getTransitionIndex());
+        fadeOutAnimator.setTarget(targetView);
+        fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float alpha = (Float) animation.getAnimatedValue("alpha");
+                targetView.setAlpha(alpha);
+            }
+        });
+
+        ValueAnimator fadeInAnimator2 = AnimationFactory.makeFadeInAnimator();
+        fadeInAnimator.setTarget(targetView);
+        fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float alpha = (Float)animation.getAnimatedValue("alpha");
+                targetView.setAlpha(alpha);
+            }
+        });
+
         List<ValueAnimator> animators = new ArrayList<>();
         animators.add(fadeOutAnimator);
         animators.add(fadeInAnimator);
+        animators.add(fadeOutAnimator2);
+        animators.add(fadeInAnimator2);
 
         return animators;
     }

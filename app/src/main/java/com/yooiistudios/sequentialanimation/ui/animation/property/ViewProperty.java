@@ -16,11 +16,11 @@ public class ViewProperty {
     private AnimationListener mAnimationListener;
     private int mViewIndex;
     private int mAnimationIndex;
-    private boolean mIsAnimating;
+//    private boolean mIsAnimating;
 
     public ViewProperty() {
         mAnimationIndex = 0;
-        mIsAnimating = true;
+//        mIsAnimating = true;
     }
 
     public View getView() {
@@ -59,13 +59,17 @@ public class ViewProperty {
         mAnimationIndex++;
     }
 
-    public boolean isAnimating() {
-        return mIsAnimating;
+    public void resetTransitionIndex() {
+        mAnimationIndex = 0;
     }
 
-    public void setAnimating(boolean isAnimating) {
-        mIsAnimating = isAnimating;
-    }
+//    public boolean isAnimating() {
+//        return mIsAnimating;
+//    }
+//
+//    public void setAnimating(boolean isAnimating) {
+//        mIsAnimating = isAnimating;
+//    }
 
     public static class Builder {
         private View mView;
@@ -103,7 +107,7 @@ public class ViewProperty {
             ViewProperty property = new ViewProperty();
             property.setView(mView);
             property.setViewIndex(mViewIndex);
-            property.setAnimating(mIsAnimating);
+//            property.setAnimating(mIsAnimating);
             property.setAnimationIndex(mAnimationIndex);
             property.setAnimationListener(mAnimationListener);
             return property;

@@ -1,6 +1,5 @@
 package com.yooiistudios.sequentialanimation.ui;
 
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,14 +15,24 @@ import com.yooiistudios.sequentialanimation.R;
  * SimpleAdapter
  */
 public class SimpleAdapter extends RecyclerView.Adapter {
+    public interface OnBindViewHolderListener {
+        public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i);
+    }
+
     private static final String TAG = SimpleAdapter.class.getSimpleName();
+
+    private OnBindViewHolderListener mOnBindViewHolderListener;
+
+    public void setOnBindViewHolderListener(OnBindViewHolderListener onBindViewHolderListener) {
+        mOnBindViewHolderListener = onBindViewHolderListener;
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         Log.i(TAG, "onCreateViewHolder : " + i);
         View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(
                 R.layout.recycler_item, null);
-        ViewCompat.setHasTransientState(itemView, true);
+//        ViewCompat.setHasTransientState(itemView, true);
         return new SimpleViewHolder(itemView);
     }
 
@@ -33,10 +42,10 @@ public class SimpleAdapter extends RecyclerView.Adapter {
         SimpleViewHolder simpleViewHolder = (SimpleViewHolder)viewHolder;
 
         simpleViewHolder.textView.setText("Position : " + (i < 10 ? 0 + String.valueOf(i) : i));
-
+        if (mOnBindViewHolderListener != null) {
+            mOnBindViewHolderListener.onBindViewHolder(viewHolder, i);
+        }
     }
-
-
 
     @Override
     public int getItemCount() {

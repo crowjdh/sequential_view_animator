@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.fragment.BaseFragment;
 import com.yooiistudios.sequentialanimation.ui.fragment.RecyclerViewAnimationFragment;
+import com.yooiistudios.sequentialanimation.ui.fragment.RecyclerViewValueAnimatorFragment;
 import com.yooiistudios.sequentialanimation.ui.fragment.StaticAnimationFragment;
 import com.yooiistudios.sequentialanimation.ui.fragment.StaticValueAnimatorFragment;
 
@@ -144,7 +145,7 @@ public class MainActivity extends ActionBarActivity
             case TAG_FRAGMENT_STATIC_VALUE_ANIMATOR:
                 return new StaticValueAnimatorFragment();
             case TAG_FRAGMENT_RECYCLER_VALUE_ANIMATOR:
-                return new RecyclerViewAnimationFragment();
+                return new RecyclerViewValueAnimatorFragment();
             default:
                 return null;
         }

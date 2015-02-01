@@ -8,6 +8,7 @@ import com.yooiistudios.sequentialanimation.ui.AnimationListenerImpl;
 import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator.AnimationProperty;
@@ -25,6 +26,7 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
     protected void transit(ViewProperty property, AnimationTransitionListener transitionListener) {
         List<Animation> animations = getTransitionProperty().getTransitions(property.getView());
         Animation animation = animations.get(property.getTransitionIndex());
+        animation.setAnimationListener(transitionListener);
 
         startAnimation(property, animation);
     }
@@ -53,7 +55,7 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
 
     @Override
     protected AnimationTransitionListener makeTransitionListener(ViewProperty property) {
-        AnimationTransitionListener listener = new AnimationTransitionListener(property);
+        AnimationTransitionListener listener = new AnimationTransitionListener(this, property);
         // FIXME 아래 라인 copy & paste 임. super 로 빼야 할듯
         listener.setIsLastTransition(isLastTransition(property));
 
@@ -62,10 +64,13 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
 
     protected static class AnimationTransitionListener extends AnimationListenerImpl
             implements SerialAnimator.TransitionListener {
+        // TODO 추상화
+        private WeakReference<SerialAnimator> mAnimatorWeakReference;
         private ViewProperty mViewProperty;
         private boolean mIsLastTransition;
 
-        public AnimationTransitionListener(ViewProperty viewProperty) {
+        public AnimationTransitionListener(SerialAnimator animator, ViewProperty viewProperty) {
+            mAnimatorWeakReference = new WeakReference<>(animator);
             mViewProperty = viewProperty;
         }
 
@@ -99,6 +104,7 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
             if (callback != null) {
                 callback.onAnimationEnd(getViewProperty());
             }
+            mAnimatorWeakReference.get().setAnimating(false);
         }
     }
 
@@ -109,12 +115,14 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
         }
 
         @Override
-        protected long getDelayBeforeTransitions(ViewProperty property) {
-            long delayBeforeTransitions = 0;
+        protected long getDelayBetweenTransitions(ViewProperty property) {
+            long delayBeforeTransitions;
             View targetView = property.getView();
-            for (int i = 0; i < property.getTransitionIndex(); i++) {
-                delayBeforeTransitions += getTransitions(targetView).get(i).getDuration()
-                        * property.getTransitionIndex();
+            if (property.getTransitionIndex() == 0) {
+                delayBeforeTransitions = 0;
+            } else {
+                int previousTransitionIndex = property.getTransitionIndex() - 1;
+                delayBeforeTransitions = getTransitions(targetView).get(previousTransitionIndex).getDuration();
             }
 
             return delayBeforeTransitions;

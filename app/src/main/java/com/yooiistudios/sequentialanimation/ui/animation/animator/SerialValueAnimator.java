@@ -1,14 +1,14 @@
 package com.yooiistudios.sequentialanimation.ui.animation.animator;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.support.annotation.NonNull;
 import android.view.View;
-import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimation.ui.AnimationListenerImpl;
 import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +23,7 @@ import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialV
  */
 public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         SerialValueAnimator.ValueTransitionListener> {
+    private static final String TAG = SerialValueAnimator.class.getSimpleName();
     private Map<ViewProperty, ValueAnimator> mValueAnimators;
 
     public SerialValueAnimator() {
@@ -30,12 +31,44 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     }
 
     @Override
+    public void putAnimateViewPropertyAt(ViewProperty property, int idx) {
+        super.putAnimateViewPropertyAt(property, idx);
+//        if (isAnimating()) {
+//            long transitionStartTime = getStartTimeInMilli() + getTransitionProperty().getDelay(property);
+//            long transitionEndTime = transitionStartTime + getTransitionProperty().getTotalTransitionDuration();
+//            long currentTime = System.currentTimeMillis();
+////            Log.i(TAG, "transitionStartTime : " + transitionStartTime);
+////            Log.i(TAG, "transitionEndTime : " + transitionEndTime);
+////            Log.i(TAG, "currentTime : " + currentTime);
+//
+//            if (transitionStartTime < currentTime && transitionEndTime > currentTime) {
+//                long timePast = currentTime - transitionStartTime;
+//
+//                List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions(property.getView());
+//                ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionIndex());
+//                valueAnimator.setCurrentPlayTime(timePast);
+//                valueAnimator.start();
+//            }
+//        }
+    }
+
+    @Override
     protected void transit(ViewProperty property, ValueTransitionListener transitionListener) {
         List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions(property.getView());
+        if (isLastTransition(property)) {
+            for (ValueAnimator animator : valueAnimators) {
+                animator.addListener(transitionListener);
+            }
+        }
         ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionIndex());
         valueAnimator.start();
 
         mValueAnimators.put(property, valueAnimator);
+    }
+
+    @Override
+    protected boolean isReadyForTransition() {
+        return super.isReadyForTransition() && !isAnimating();
     }
 
     @Override
@@ -47,33 +80,33 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     public void cancelAllTransitions() {
         super.cancelAllTransitions();
         for (Map.Entry<ViewProperty, ValueAnimator> entry : mValueAnimators.entrySet()) {
-            // XXX 테스트 안됨
             ViewProperty viewProperty = entry.getKey();
             ValueAnimator animator = entry.getValue();
             animator.cancel();
 
             List<ValueAnimator> valueAnimators = getTransitionProperty().getTransitions(viewProperty.getView());
             ValueAnimator valueAnimator = valueAnimators.get(0);
-
-//            valueAnimator.cancel();
             valueAnimator.setCurrentPlayTime(0);
         }
     }
 
     @Override
     protected ValueTransitionListener makeTransitionListener(ViewProperty property) {
-        ValueTransitionListener listener = new ValueTransitionListener(property);
+        ValueTransitionListener listener = new ValueTransitionListener(this, property);
         // FIXME 아래 라인 copy & paste 임. super 로 빼야 할듯
         listener.setIsLastTransition(isLastTransition(property));
 
         return listener;
     }
-    protected static class ValueTransitionListener extends AnimationListenerImpl
-            implements SerialAnimator.TransitionListener {
+
+    protected static class ValueTransitionListener
+            implements SerialAnimator.TransitionListener, ValueAnimator.AnimatorListener {
+        private WeakReference<SerialAnimator> mAnimatorWeakReference;
         private ViewProperty mViewProperty;
         private boolean mIsLastTransition;
 
-        public ValueTransitionListener(ViewProperty viewProperty) {
+        public ValueTransitionListener(SerialAnimator animator, ViewProperty viewProperty) {
+            mAnimatorWeakReference = new WeakReference<>(animator);
             mViewProperty = viewProperty;
         }
 
@@ -89,15 +122,6 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
             mIsLastTransition = isLastTransition;
         }
 
-        @Override
-        public final void onAnimationEnd(Animation animation) {
-            super.onAnimationEnd(animation);
-
-            if (isLastTransition()) {
-                notifyOnAnimationEnd();
-            }
-        }
-
         private void notifyOnAnimationEnd() {
             ViewProperty.AnimationListener callback =
                     getViewProperty().getAnimationListener();
@@ -108,6 +132,20 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
                 callback.onAnimationEnd(getViewProperty());
             }
         }
+
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (isLastTransition()) {
+                notifyOnAnimationEnd();
+
+                mAnimatorWeakReference.get().setAnimating(false);
+            }
+        }
+
+        @Override public void onAnimationStart(Animator animation) { }
+        @Override public void onAnimationCancel(Animator animation) { }
+        @Override public void onAnimationRepeat(Animator animation) { }
     }
 
     public static class ValueAnimatorProperty extends SerialAnimator.TransitionProperty<ValueAnimator> {
@@ -117,12 +155,27 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         }
 
         @Override
-        protected long getDelayBeforeTransitions(ViewProperty property) {
-            long delayBeforeTransitions = 0;
+        protected long getDelayBetweenTransitions(ViewProperty property) {
+            long delayBeforeTransitions;
             View targetView = property.getView();
-            for (int i = 0; i < property.getTransitionIndex(); i++) {
-                delayBeforeTransitions += getTransitions(targetView).get(i).getDuration()
-                        * property.getTransitionIndex();
+            if (property.getTransitionIndex() == 0) {
+                delayBeforeTransitions = 0;
+            } else {
+                int previousTransitionIndex = property.getTransitionIndex() - 1;
+                delayBeforeTransitions = getTransitions(targetView).get(previousTransitionIndex).getDuration();
+            }
+
+            return delayBeforeTransitions;
+        }
+
+        // TODO 추상화
+        protected long getTotalTransitionDuration() {
+            long delayBeforeTransitions = 0;
+            List<ValueAnimator> transitions = getTransitions(null);
+            for (int i = 0; i < transitions.size(); i++) {
+                ValueAnimator animator = transitions.get(i);
+                // FIXME i 말고 property.getTransitionIndex() 넣어야 하는데 생각해보자
+                delayBeforeTransitions += animator.getDuration();
             }
 
             return delayBeforeTransitions;
