@@ -23,9 +23,9 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
         SerialAnimationAnimator.AnimationTransitionListener> {
 
     @Override
-    protected void transit(ViewProperty property, AnimationTransitionListener transitionListener) {
+    protected void onTransit(ViewProperty property, AnimationTransitionListener transitionListener) {
         List<Animation> animations = getTransitionProperty().getTransitions(property.getView());
-        Animation animation = animations.get(property.getTransitionIndex());
+        Animation animation = animations.get(property.getTransitionInfo().getIndex());
         animation.setAnimationListener(transitionListener);
 
         startAnimation(property, animation);
@@ -104,7 +104,7 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
             if (callback != null) {
                 callback.onAnimationEnd(getViewProperty());
             }
-            mAnimatorWeakReference.get().setAnimating(false);
+//            mAnimatorWeakReference.get().setAnimating(false);
         }
     }
 
@@ -115,17 +115,8 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
         }
 
         @Override
-        protected long getDelayBetweenTransitions(ViewProperty property) {
-            long delayBeforeTransitions;
-            View targetView = property.getView();
-            if (property.getTransitionIndex() == 0) {
-                delayBeforeTransitions = 0;
-            } else {
-                int previousTransitionIndex = property.getTransitionIndex() - 1;
-                delayBeforeTransitions = getTransitions(targetView).get(previousTransitionIndex).getDuration();
-            }
-
-            return delayBeforeTransitions;
+        protected long getDuration(Animation transition) {
+            return transition.getDuration();
         }
     }
 }

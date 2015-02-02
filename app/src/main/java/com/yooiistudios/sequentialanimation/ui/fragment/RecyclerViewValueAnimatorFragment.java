@@ -10,10 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.yooiistudios.sequentialanimation.R;
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
-import com.yooiistudios.sequentialanimation.ui.SimpleAdapter;
+import com.yooiistudios.sequentialanimation.ui.recyclerview.SimpleAdapter;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
@@ -48,6 +49,7 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
         if (rootView != null) {
             findViewsFromRootView(rootView);
             initRecyclerView();
+            initAnimator();
         }
     }
 
@@ -56,11 +58,30 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
     }
 
     private void initRecyclerView() {
+        setRecyclerListener();
         initLayoutManager();
         initAdapter();
         initItemDecoration();
 
         configLayoutSpan();
+    }
+
+    private void setRecyclerListener() {
+//        mRecycler.setRecyclerListener(new RecyclerView.RecyclerListener() {
+//            @Override
+//            public void onViewRecycled(RecyclerView.ViewHolder holder) {
+//                int index = ((SimpleAdapter.ProgressViewHolder)holder).index;
+//                getSequentialViewAnimator().removePropertyWithIndex(index);
+//            }
+//        });
+    }
+
+    private void initAnimator() {
+        SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
+
+        SerialValueAnimator.ValueAnimatorProperty transitionProperty
+                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 3000);
+        animator.setTransitionProperty(transitionProperty);
     }
 
     private void initAdapter() {
@@ -105,45 +126,43 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
     @NonNull
     @Override
     public List<ValueAnimator> onSupplyTransitionList(final View targetView) {
-        ValueAnimator fadeOutAnimator = AnimationFactory.makeFadeOutAnimator();
-//        ValueAnimator animator = valueAnimators.get(property.getTransitionIndex());
+        ValueAnimator fadeOutAnimator = AnimationFactory.makeIncreasingProgressAnimator();
         fadeOutAnimator.setTarget(targetView);
         fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                float alpha = (Float) animation.getAnimatedValue("alpha");
-                targetView.setAlpha(alpha);
+                int progress = (Integer) animation.getAnimatedValue("progress");
+                ((ProgressBar)targetView.findViewById(R.id.progressBar)).setProgress(progress);
             }
         });
 
-        ValueAnimator fadeInAnimator = AnimationFactory.makeFadeInAnimator();
+        ValueAnimator fadeInAnimator = AnimationFactory.makeDecreasingProgressAnimator();
         fadeInAnimator.setTarget(targetView);
         fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                float alpha = (Float)animation.getAnimatedValue("alpha");
-                targetView.setAlpha(alpha);
+                int progress = (Integer) animation.getAnimatedValue("progress");
+                ((ProgressBar)targetView.findViewById(R.id.progressBar)).setProgress(progress);
             }
         });
 
-        ValueAnimator fadeOutAnimator2 = AnimationFactory.makeFadeOutAnimator();
-//        ValueAnimator animator = valueAnimators.get(property.getTransitionIndex());
+        ValueAnimator fadeOutAnimator2 = AnimationFactory.makeIncreasingProgressAnimator();
         fadeOutAnimator2.setTarget(targetView);
         fadeOutAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                float alpha = (Float) animation.getAnimatedValue("alpha");
-                targetView.setAlpha(alpha);
+                int progress = (Integer) animation.getAnimatedValue("progress");
+                ((ProgressBar)targetView.findViewById(R.id.progressBar)).setProgress(progress);
             }
         });
 
-        ValueAnimator fadeInAnimator2 = AnimationFactory.makeFadeInAnimator();
+        ValueAnimator fadeInAnimator2 = AnimationFactory.makeDecreasingProgressAnimator();
         fadeInAnimator2.setTarget(targetView);
         fadeInAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                float alpha = (Float)animation.getAnimatedValue("alpha");
-                targetView.setAlpha(alpha);
+                int progress = (Integer) animation.getAnimatedValue("progress");
+                ((ProgressBar)targetView.findViewById(R.id.progressBar)).setProgress(progress);
             }
         });
 
@@ -158,16 +177,7 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
 
     @Override
     public void startAnimation() {
-//        int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
-//        int lastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
-
-        SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
-
-        SerialValueAnimator.ValueAnimatorProperty transitionProperty
-                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 300);
-        animator.setTransitionProperty(transitionProperty);
-
-        animator.animate();
+        getSequentialViewAnimator().animate();
     }
 
     @Override

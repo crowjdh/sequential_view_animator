@@ -17,9 +17,11 @@ import com.yooiistudios.sequentialanimation.R;
  * AnimationFactory
  */
 public class AnimationFactory {
-    private static final long ANIM_DURATION_MILLISEC = 500;
+    private static final long ANIM_DURATION_MILLISEC = 3000;
+//    private static final Interpolator INTERPOLATOR =
+//            new CubicBezierInterpolator(.57f, .15f, .65f, .67f);
     private static final Interpolator INTERPOLATOR =
-            new CubicBezierInterpolator(.57f, .15f, .65f, .67f);
+            new CubicBezierInterpolator(.0f, .0f, 1.f, 1.f);
     private static final int INTERPOLATOR_RES_ID = R.animator.interpolator_bottom_fade;
 
     public static Animation makeBottomFadeOutAnimation(Context context) {
@@ -53,7 +55,7 @@ public class AnimationFactory {
         PropertyValuesHolder holder = PropertyValuesHolder.ofFloat("alpha", 0.0f, 1.0f);
         Interpolator interpolator = INTERPOLATOR;
         ValueAnimator animator = ValueAnimator.ofPropertyValuesHolder(holder);
-        animator.setDuration(300);
+        animator.setDuration(ANIM_DURATION_MILLISEC);
         animator.setInterpolator(interpolator);
 
         return animator;
@@ -63,7 +65,27 @@ public class AnimationFactory {
         PropertyValuesHolder holder = PropertyValuesHolder.ofFloat("alpha", 1.0f, 0.0f);
         Interpolator interpolator = INTERPOLATOR;
         ValueAnimator animator = ValueAnimator.ofPropertyValuesHolder(holder);
-        animator.setDuration(300);
+        animator.setDuration(ANIM_DURATION_MILLISEC);
+        animator.setInterpolator(interpolator);
+
+        return animator;
+    }
+
+    public static ValueAnimator makeDecreasingProgressAnimator() {
+        PropertyValuesHolder holder = PropertyValuesHolder.ofInt("progress", 100, 0);
+        Interpolator interpolator = INTERPOLATOR;
+        ValueAnimator animator = ValueAnimator.ofPropertyValuesHolder(holder);
+        animator.setDuration(ANIM_DURATION_MILLISEC);
+        animator.setInterpolator(interpolator);
+
+        return animator;
+    }
+
+    public static ValueAnimator makeIncreasingProgressAnimator() {
+        PropertyValuesHolder holder = PropertyValuesHolder.ofInt("progress", 0, 100);
+        Interpolator interpolator = INTERPOLATOR;
+        ValueAnimator animator = ValueAnimator.ofPropertyValuesHolder(holder);
+        animator.setDuration(ANIM_DURATION_MILLISEC);
         animator.setInterpolator(interpolator);
 
         return animator;
@@ -73,7 +95,7 @@ public class AnimationFactory {
         PropertyValuesHolder holder = PropertyValuesHolder.ofFloat("alpha", 0.0f, 1.0f);
         Interpolator interpolator = new CubicBezierInterpolator(.57f, .15f, .65f, .67f);
         ValueAnimator animator = ObjectAnimator.ofPropertyValuesHolder(holder);
-        animator.setDuration(1000);
+        animator.setDuration(ANIM_DURATION_MILLISEC);
         animator.setInterpolator(interpolator);
 
         return animator;

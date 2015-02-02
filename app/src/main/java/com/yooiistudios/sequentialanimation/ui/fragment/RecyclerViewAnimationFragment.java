@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimation.R;
-import com.yooiistudios.sequentialanimation.ui.SimpleAdapter;
+import com.yooiistudios.sequentialanimation.ui.recyclerview.SimpleAdapter;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoration;
