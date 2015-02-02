@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
 import java.lang.ref.WeakReference;
@@ -32,9 +33,9 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         mTransitionHandler = new TransitionHandler(this);
     }
 
-    public void removePropertyWithIndex(int idx) {
-        mViewProperties.delete(idx);
-    }
+//    public void removePropertyWithIndex(int idx) {
+//        mViewProperties.delete(idx);
+//    }
 
     public void putAnimateViewPropertyAt(ViewProperty property, int idx) {
         mViewProperties.put(idx, property);
@@ -62,7 +63,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
             int propertyIndex = mViewProperties.keyAt(i);
             ViewProperty property = mViewProperties.get(propertyIndex);
-            beforeRequestTransition(property);
+//            beforeRequestTransition(property);
             requestTransition(property);
         }
     }
@@ -94,14 +95,16 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     }
 
     private void transit(ViewProperty property) {
+        ViewTransientUtils.setState(property);
         S listener = makeTransitionListener(property);
         onTransit(property, listener);
     }
 
     protected abstract void onTransit(ViewProperty property, S transitionListener);
 
-    // TODO 리스너로 뺄 수 있으면 빼자
-    protected abstract void beforeRequestTransition(ViewProperty property);
+//    private void beforeRequestTransition(ViewProperty property) {
+//        ViewTransientUtils.setState(property);
+//    }
 
     protected boolean isLastTransition(ViewProperty property) {
         List transitions = getTransitionProperty().getTransitions(property.getView());

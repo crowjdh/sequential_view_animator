@@ -33,15 +33,19 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     @Override
     public void putAnimateViewPropertyAt(ViewProperty viewProperty, int idx) {
         super.putAnimateViewPropertyAt(viewProperty, idx);
+        Log.i(TAG, "View index : " + idx);
 
         ValueAnimatorProperty transitionProperty = getTransitionProperty();
         if (transitionProperty.inTimeToTransit(viewProperty, getStartTimeInMilli())) {
+            Log.i(TAG, "inTimeToTransit : true");
             int transitionIndex = transitionProperty.getTransitionIndexForProperty(viewProperty);
             viewProperty.getTransitionInfo().setIndex(transitionIndex);
 
             long currentPlayTime = transitionProperty.getCurrentPlayTime(viewProperty, getStartTimeInMilli());
             viewProperty.getTransitionInfo().setCurrentPlayTime(currentPlayTime);
             transitAndRequestNext(viewProperty);
+        } else {
+            Log.i(TAG, "inTimeToTransit : false");
         }
         // TODO 지금은 애니메이션할 시간이 아니지만 후에 애니메이션해야될 녀석들 처리
 //        else {
@@ -57,8 +61,6 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
                 animator.addListener(transitionListener);
             }
         }
-        Log.i(TAG, "transition index : " + property.getTransitionInfo().getIndex());
-        Log.i(TAG, "current play time: " + property.getTransitionInfo().getCurrentPlayTime());
         ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionInfo().getIndex());
         valueAnimator.start();
         valueAnimator.setCurrentPlayTime(property.getTransitionInfo().getCurrentPlayTime());
@@ -69,11 +71,6 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     @Override
     protected boolean isReadyForTransition() {
         return super.isReadyForTransition();// && !isAnimating();
-    }
-
-    @Override
-    protected void beforeRequestTransition(ViewProperty property) {
-        ViewTransientUtils.setState(property);
     }
 
     @Override

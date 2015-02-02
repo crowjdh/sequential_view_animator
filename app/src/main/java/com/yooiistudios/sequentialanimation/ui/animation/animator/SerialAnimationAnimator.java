@@ -32,11 +32,6 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
     }
 
     @Override
-    protected void beforeRequestTransition(ViewProperty property) {
-        ViewTransientUtils.setState(property);
-    }
-
-    @Override
     public void cancelAllTransitions() {
         super.cancelAllTransitions();
         for (int i = 0; i < getViewProperties().size(); i++) {
