@@ -1,7 +1,6 @@
 package com.yooiistudios.sequentialanimation.ui.animation;
 
 import android.support.v4.view.ViewCompat;
-import android.util.Log;
 import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
@@ -20,7 +19,7 @@ public class ViewTransientUtils {
     // 애니메이션이 끝난 후 다시 false 로 바꿔주는 방식을 사용했다.
     // 링크 : http://youtu.be/8MIfSxgsHIs
     public static void setState(ViewProperty property) {
-        Log.i(TAG, "setTransient(true) : " + property.getViewIndex());
+//        Log.i(TAG, "setTransient(true) : " + property.getViewIndex());
         setState(property.getView());
     }
 
@@ -29,7 +28,7 @@ public class ViewTransientUtils {
     }
 
     public static void clearState(ViewProperty property) {
-        Log.i(TAG, "setTransient(false) : " + property.getViewIndex());
+//        Log.i(TAG, "setTransient(false) : " + property.getViewIndex());
         clearState(property.getView());
     }
 

@@ -25,7 +25,7 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
     @Override
     protected void onTransit(ViewProperty property, AnimationTransitionListener transitionListener) {
         List<Animation> animations = getTransitionProperty().getTransitions(property.getView());
-        Animation animation = animations.get(property.getTransitionInfo().getIndex());
+        Animation animation = animations.get(property.getTransitionInfo().index);
         animation.setAnimationListener(transitionListener);
 
         startAnimation(property, animation);

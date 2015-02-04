@@ -190,6 +190,6 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
                         .setViewIndex(i)
                         .setAnimationListener(this)
                         .build();
-        animator.putAnimateViewPropertyAt(property, i);
+        animator.putViewPropertyIfRoom(property, i);
     }
 }

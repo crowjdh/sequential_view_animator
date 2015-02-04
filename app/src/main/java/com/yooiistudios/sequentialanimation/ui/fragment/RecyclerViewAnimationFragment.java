@@ -106,7 +106,7 @@ public class RecyclerViewAnimationFragment extends AnimationFragment {
                             .setAnimationListener(this)
                             .build();
 
-            animator.putAnimateViewPropertyAt(property, i);
+            animator.putViewPropertyIfRoom(property, i);
         }
 
         SerialAnimationAnimator.AnimationProperty transitionProperty = new SerialAnimationAnimator.AnimationProperty(this, 0, 1000);

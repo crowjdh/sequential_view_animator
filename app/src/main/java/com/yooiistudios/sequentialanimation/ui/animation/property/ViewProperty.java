@@ -8,7 +8,7 @@ import android.view.View;
  * ViewProperty
  *  애니메이션될 뷰의 속성
  */
-public class ViewProperty {
+public class ViewProperty implements Cloneable, AbstractViewProperty {
     public interface AnimationListener {
         public void onAnimationEnd(ViewProperty property);
     }
@@ -19,6 +19,42 @@ public class ViewProperty {
 
     public ViewProperty() {
         mTransitionInfo = TransitionInfo.makeDefault();
+    }
+
+    public void changeToNextTransitionState() {
+        getTransitionInfo().index++;
+        getTransitionInfo().currentPlayTime = TransitionInfo.DEFAULT_CURRENT_PLAY_TIME;
+    }
+
+//    public void setUseNextTransition(boolean useNextTransition) {
+//        getTransitionInfo().useNextTransition = useNextTransition;
+//    }
+
+//    public boolean isUseNextTransition() {
+//        return getTransitionInfo().useNextTransition;
+//    }
+
+    public void resetTransitionInfo() {
+        TransitionInfo resetTransitionInfo = TransitionInfoManipulator.resetTransitionInfo(getTransitionInfo());
+        setTransitionInfo(resetTransitionInfo);
+    }
+
+    public AbstractViewProperty makeShallowCloneWithDeepTransitionInfoCloneWhenPossible() {
+        AbstractViewProperty abstractViewProperty;
+        try {
+            ViewProperty viewProperty = (ViewProperty)clone();
+            TransitionInfo clonedTransitionInfo =
+                    TransitionInfoManipulator.makeShallowCloneWhenPossible(viewProperty.getTransitionInfo());
+            viewProperty.setTransitionInfo(clonedTransitionInfo);
+
+            abstractViewProperty = viewProperty;
+        } catch(CloneNotSupportedException e) {
+            e.printStackTrace();
+//            throw new CloneNotSupportedException("");
+            abstractViewProperty = new NullViewProperty();
+        }
+
+        return abstractViewProperty;
     }
 
     public View getView() {
@@ -55,13 +91,13 @@ public class ViewProperty {
         mViewIndex = viewIndex;
     }
 
-    public void increaseTransitionIndexAndResetCurrentPlayTime() {
-        mTransitionInfo.increaseTransitionIndex();
-        mTransitionInfo.setCurrentPlayTime(0L);
-    }
-
-    public void resetTransitionInfo() {
-        mTransitionInfo.reset();
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("View index : ").append(mViewIndex)
+                .append("\n")
+                .append(mTransitionInfo.toString());
+        return builder.toString();
     }
 
     public static class Builder {
@@ -95,44 +131,53 @@ public class ViewProperty {
         }
     }
 
-    public static class TransitionInfo {
-        private static final int DEFAULT_INDEX = 0;
-        private static final long DEFAULT_CURRENT_PLAY_TIME = 0L;
-        private int mIndex;
-        private long mCurrentPlayTime;
+    public static class TransitionInfo implements Cloneable {
+        public static final int DEFAULT_INDEX = 0;
+        public static final long DEFAULT_CURRENT_PLAY_TIME = 0L;
+        public int index;
+        public long currentPlayTime;
+//        public boolean useNextTransition;
 
         public TransitionInfo(int index, long currentPlayTime) {
-            mIndex = index;
-            mCurrentPlayTime = currentPlayTime;
-        }
-
-        public int getIndex() {
-            return mIndex;
-        }
-
-        public void setIndex(int index) {
-            mIndex = index;
-        }
-
-        public long getCurrentPlayTime() {
-            return mCurrentPlayTime;
-        }
-
-        public void setCurrentPlayTime(long currentPlayTime) {
-            mCurrentPlayTime = currentPlayTime;
-        }
-
-        public void increaseTransitionIndex() {
-            mIndex++;
-        }
-
-        public void reset() {
-            setIndex(DEFAULT_INDEX);
-            setCurrentPlayTime(DEFAULT_CURRENT_PLAY_TIME);
+            this.index = index;
+            this.currentPlayTime = currentPlayTime;
         }
 
         public static TransitionInfo makeDefault() {
             return new TransitionInfo(DEFAULT_INDEX, DEFAULT_CURRENT_PLAY_TIME);
+        }
+
+        @Override
+        public Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Transition index: ").append(index)
+                    .append("\nCurrent play time: ").append(currentPlayTime);
+//                    .append("\nuseNextTransition: ").append(useNextTransition);
+
+            return builder.toString();
+        }
+    }
+
+    private static final class TransitionInfoManipulator {
+        private TransitionInfoManipulator() throws IllegalAccessException {
+            throw new IllegalAccessException("You MUST NOT instantiate this class.");
+        }
+
+        private static TransitionInfo resetTransitionInfo(TransitionInfo transitionInfo) {
+            transitionInfo.index = TransitionInfo.DEFAULT_INDEX;
+            transitionInfo.currentPlayTime = TransitionInfo.DEFAULT_CURRENT_PLAY_TIME;
+
+            return transitionInfo;
+        }
+
+        public static TransitionInfo makeShallowCloneWhenPossible(TransitionInfo info)
+                throws CloneNotSupportedException {
+            return (TransitionInfo)info.clone();
         }
     }
 }

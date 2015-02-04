@@ -128,10 +128,10 @@ public class StaticValueAnimatorFragment extends ValueAnimatorFragment {
 
 //        ObjectAnimator.ofArgb().setTarget();
         SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
-        animator.putAnimateViewPropertyAt(property0, 0);
-        animator.putAnimateViewPropertyAt(property1, 1);
-        animator.putAnimateViewPropertyAt(property2, 2);
-        animator.putAnimateViewPropertyAt(property3, 3);
+        animator.putViewPropertyIfRoom(property0, 0);
+        animator.putViewPropertyIfRoom(property1, 1);
+        animator.putViewPropertyIfRoom(property2, 2);
+        animator.putViewPropertyIfRoom(property3, 3);
 
         SerialValueAnimator.ValueAnimatorProperty transitionProperty
                 = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 1000);

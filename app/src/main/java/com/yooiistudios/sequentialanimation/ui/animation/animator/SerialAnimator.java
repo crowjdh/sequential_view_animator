@@ -3,10 +3,12 @@ package com.yooiistudios.sequentialanimation.ui.animation.animator;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
+import com.yooiistudios.sequentialanimation.ui.animation.property.AbstractViewProperty;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
 import java.lang.ref.WeakReference;
@@ -33,18 +35,6 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         mTransitionHandler = new TransitionHandler(this);
     }
 
-//    public void removePropertyWithIndex(int idx) {
-//        mViewProperties.delete(idx);
-//    }
-
-    public void putAnimateViewPropertyAt(ViewProperty property, int idx) {
-        mViewProperties.put(idx, property);
-    }
-
-    public void setTransitionProperty(T transitionProperty) {
-        mTransitionProperty = transitionProperty;
-    }
-
     public void animate() {
         if (isReadyForTransition()) {
             cancelAllTransitions();
@@ -57,35 +47,52 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         mTransitionHandler.removeCallbacksAndMessages(null);
     }
 
+    private void prepareForNewTransitionSequence() {
+        mStartTimeInMilli = System.currentTimeMillis();
+//        mIsAnimating = true;
+
+        int viewCount = mViewProperties.size();
+        for (int i = 0; i < viewCount; i++) {
+            // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
+            int propertyIndex = mViewProperties.keyAt(i);
+            ViewProperty viewProperty = mViewProperties.get(propertyIndex);
+            viewProperty.resetTransitionInfo();
+        }
+    }
+
     private void runSequentialTransition() {
         int viewCount = mViewProperties.size();
         for (int i = 0; i < viewCount; i++) {
             // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
             int propertyIndex = mViewProperties.keyAt(i);
             ViewProperty property = mViewProperties.get(propertyIndex);
-//            beforeRequestTransition(property);
             requestTransition(property);
         }
     }
 
-    protected void requestTransition(ViewProperty property) {
-        requestTransition(property, 0);
-    }
-
-    protected void requestTransition(ViewProperty property, long consume) {
-        long delay = getTransitionProperty().getDelay(property) - consume;
+    protected void requestTransitionWithDelayConsume(ViewProperty viewProperty, long consume) {
+        long delay = getTransitionProperty().getDelay(viewProperty) - consume;
         Message message = Message.obtain();
-        message.obj = property;
+        message.obj = viewProperty;
 
         mTransitionHandler.sendMessageDelayed(message, delay);
     }
 
-    protected void requestNextTransition(ViewProperty property) {
-        if (!isLastTransition(property)) {
-            long previousPlayTime = property.getTransitionInfo().getCurrentPlayTime();
-            property.increaseTransitionIndexAndResetCurrentPlayTime();
+    protected void requestTransition(ViewProperty viewProperty) {
+        requestTransitionWithDelayConsume(viewProperty, 0);
+    }
 
-            requestTransition(property, previousPlayTime);
+    protected void requestNextTransition(ViewProperty previousViewProperty) {
+        if (!isLastTransition(previousViewProperty)) {
+            AbstractViewProperty clonedViewProperty =
+                    previousViewProperty.makeShallowCloneWithDeepTransitionInfoCloneWhenPossible();
+            if (clonedViewProperty instanceof ViewProperty) {
+                ViewProperty legitViewProperty = (ViewProperty)clonedViewProperty;
+                legitViewProperty.changeToNextTransitionState();
+
+                long consume = previousViewProperty.getTransitionInfo().currentPlayTime;
+                requestTransitionWithDelayConsume(legitViewProperty, consume);
+            }
         }
     }
 
@@ -102,43 +109,28 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
 
     protected abstract void onTransit(ViewProperty property, S transitionListener);
 
-//    private void beforeRequestTransition(ViewProperty property) {
-//        ViewTransientUtils.setState(property);
-//    }
+    public void putViewPropertyIfRoom(ViewProperty requestedViewProperty, int idx) {
+        ViewProperty viewProperty = mViewProperties.get(idx);
+        if (viewProperty == null) {
+            mViewProperties.put(idx, requestedViewProperty);
+        } else {
+            mViewProperties.get(idx).setView(requestedViewProperty.getView());
+            mViewProperties.get(idx).setAnimationListener(requestedViewProperty.getAnimationListener());
+        }
+    }
+
+    public void setTransitionProperty(T transitionProperty) {
+        mTransitionProperty = transitionProperty;
+    }
 
     protected boolean isLastTransition(ViewProperty property) {
         List transitions = getTransitionProperty().getTransitions(property.getView());
-        return property.getTransitionInfo().getIndex() == transitions.size() - 1;
+        return property.getTransitionInfo().index == transitions.size() - 1;
     }
 
     protected boolean isReadyForTransition() {
         return mViewProperties.size() > 0 && mTransitionProperty != null;
     }
-
-    private void prepareForNewTransitionSequence() {
-        mStartTimeInMilli = System.currentTimeMillis();
-//        mIsAnimating = true;
-
-        int viewCount = mViewProperties.size();
-        for (int i = 0; i < viewCount; i++) {
-            // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
-            int propertyIndex = mViewProperties.keyAt(i);
-            ViewProperty viewProperty = mViewProperties.get(propertyIndex);
-            viewProperty.resetTransitionInfo();
-        }
-    }
-
-//    protected void onAnimationEnd() {
-//        mIsAnimating = false;
-//    }
-
-//    protected boolean isAnimating() {
-//        return mIsAnimating;
-//    }
-
-//    protected void setAnimating(boolean isAnimating) {
-//        mIsAnimating = isAnimating;
-//    }
 
     protected long getStartTimeInMilli() {
         return mStartTimeInMilli;
@@ -236,22 +228,21 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         }
 
         protected final long getDelay(ViewProperty property) {
-            long delayBetweenTransitions = getDelayOffset(property);
-            long delay = getInitialDelayInMillisec() + delayBetweenTransitions;
+            long delay = getInitialDelayInMillisec() + getPreviousTransitionDuration(property);
 
-            if (property.getTransitionInfo().getIndex() == 0) {
-                delay += getBaseDelay(property);
+            if (property.getTransitionInfo().index == 0) {
+                delay += getDelayForInitialTransition(property);
             }
 
             return delay;
         }
 
-        protected final long getBaseDelay(ViewProperty property) {
+        protected final long getDelayForInitialTransition(ViewProperty property) {
             return getIntervalInMillisec() * property.getViewIndex();
         }
 
-        protected long getTotalTransitionDuration(ViewProperty viewProperty) {
-            long totalDuration = getDelay(viewProperty);
+        protected long getTotalTransitionDuration() {
+            long totalDuration = 0;//getDelay(viewProperty);
             List<T> transitions = getDummyTransitions();
             for (int i = 0; i < transitions.size(); i++) {
                 T transition = transitions.get(i);
@@ -267,14 +258,14 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
          * @param property
          * @return
          */
-        protected long getDelayOffset(ViewProperty property) {
+        protected long getPreviousTransitionDuration(ViewProperty property) {
             long delayBeforeTransitions;
-            View targetView = property.getView();
-            if (property.getTransitionInfo().getIndex() == 0) {
+//            View targetView = property.getView();
+            if (property.getTransitionInfo().index == 0) {
                 delayBeforeTransitions = 0;
             } else {
-                int previousTransitionIndex = property.getTransitionInfo().getIndex() - 1;
-                T previousTransition = getTransitions(targetView).get(previousTransitionIndex);
+                int previousTransitionIndex = property.getTransitionInfo().index - 1;
+                T previousTransition = getTransitions(null).get(previousTransitionIndex);
                 delayBeforeTransitions = getDuration(previousTransition);
             }
 
@@ -284,7 +275,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         protected long getDelaySinceBase(ViewProperty property) {
             long delay = 0;
             List<T> transitions = getDummyTransitions();
-            for (int i = 0; i < property.getTransitionInfo().getIndex(); i++) {
+            for (int i = 0; i < property.getTransitionInfo().index; i++) {
                 T transition = transitions.get(i);
                 delay += getDuration(transition);
             }
@@ -292,22 +283,35 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             return delay;
         }
 
-        protected boolean inTimeToTransit(ViewProperty property, long initialStartTime) {
-            long startTime = initialStartTime + getDelay(property);
-            long endTime = startTime + getTotalTransitionDuration(property);
-            return isTimeToTransit(startTime, endTime);
+        protected boolean inTimeToTransit(ViewProperty property, long timePast) {
+//            long delay = getDelay(property);
+            long startTime = getDelayForInitialTransition(property);
+            long endTime = startTime + getTotalTransitionDuration();
+
+            if (property.getViewIndex() == 0) {
+                Log.i("inTimeToTransit", "view index : " + property.getViewIndex());
+                Log.i("inTimeToTransit", "timePast : " + timePast);
+                Log.i("inTimeToTransit", "startTime : " + startTime);
+                Log.i("inTimeToTransit", "endTime : " + endTime);
+            }
+
+            return timePast > startTime && timePast < endTime;
         }
 
-        protected int getTransitionIndexForProperty(ViewProperty property) {
+        protected boolean shouldTransitInFuture(ViewProperty property, long timePast) {
+            return getDelayForInitialTransition(property) > timePast;
+        }
+
+        protected int getTransitionIndexForProperty(ViewProperty property, long timePast) {
             List<T> transitions = getDummyTransitions();
-            long transitionStartTime = getBaseDelay(property);
-            long playTime = property.getTransitionInfo().getCurrentPlayTime();
+            long transitionStartTime = getDelayForInitialTransition(property);
+//            long playTime = property.getTransitionInfo().currentPlayTime;
             int transitionIndex = 0;
             for (int i = 0; i < transitions.size(); i++) {
                 T transition = transitions.get(i);
                 long transitionEndTime = transitionStartTime + getDuration(transition);
 
-                if (playTime > transitionStartTime && playTime < transitionEndTime) {
+                if (timePast > transitionStartTime && timePast < transitionEndTime) {
                     transitionIndex = i;
                     break;
                 } else {
@@ -316,12 +320,6 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             }
 
             return transitionIndex;
-        }
-
-        // TODO 날짜 비교 클래스 만들고 추상화
-        private static boolean isTimeToTransit(long startTime, long endTime) {
-            long currentTime = System.currentTimeMillis();
-            return currentTime > startTime && currentTime < endTime;
         }
 
         protected abstract long getDuration(T transition);

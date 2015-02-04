@@ -31,26 +31,29 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     }
 
     @Override
-    public void putAnimateViewPropertyAt(ViewProperty viewProperty, int idx) {
-        super.putAnimateViewPropertyAt(viewProperty, idx);
-        Log.i(TAG, "View index : " + idx);
+    public void putViewPropertyIfRoom(ViewProperty requestedViewProperty, int idx) {
+        super.putViewPropertyIfRoom(requestedViewProperty, idx);
+
+        ViewProperty viewProperty = getViewProperties().get(idx);
 
         ValueAnimatorProperty transitionProperty = getTransitionProperty();
-        if (transitionProperty.inTimeToTransit(viewProperty, getStartTimeInMilli())) {
-            Log.i(TAG, "inTimeToTransit : true");
-            int transitionIndex = transitionProperty.getTransitionIndexForProperty(viewProperty);
-            viewProperty.getTransitionInfo().setIndex(transitionIndex);
+        long timePast = System.currentTimeMillis() - getStartTimeInMilli();
+        if (transitionProperty.inTimeToTransit(viewProperty, timePast)) {
+            int transitionIndex = transitionProperty.getTransitionIndexForProperty(viewProperty, timePast);
+            viewProperty.getTransitionInfo().index = transitionIndex;
 
-            long currentPlayTime = transitionProperty.getCurrentPlayTime(viewProperty, getStartTimeInMilli());
-            viewProperty.getTransitionInfo().setCurrentPlayTime(currentPlayTime);
+            long currentPlayTime = transitionProperty.getCurrentPlayTime(viewProperty, timePast);
+            viewProperty.getTransitionInfo().currentPlayTime = currentPlayTime;
+
+            Log.i("putViewPropertyIfRoom", "View index : " + idx);
+            Log.i("putViewPropertyIfRoom", "inTimeToTransit");
+            Log.i("putViewPropertyIfRoom", "transitionIndex : " + transitionIndex);
+            Log.i("putViewPropertyIfRoom", "currentPlayTime : " + currentPlayTime);
             transitAndRequestNext(viewProperty);
-        } else {
-            Log.i(TAG, "inTimeToTransit : false");
+        } else if (transitionProperty.shouldTransitInFuture(viewProperty, getStartTimeInMilli())){
+            Log.i("putViewPropertyIfRoom", "shouldTransitInFuture");
         }
         // TODO 지금은 애니메이션할 시간이 아니지만 후에 애니메이션해야될 녀석들 처리
-//        else {
-//            requestTransition();
-//        }
     }
 
     @Override
@@ -61,9 +64,9 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
                 animator.addListener(transitionListener);
             }
         }
-        ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionInfo().getIndex());
+        ValueAnimator valueAnimator = valueAnimators.get(property.getTransitionInfo().index);
         valueAnimator.start();
-        valueAnimator.setCurrentPlayTime(property.getTransitionInfo().getCurrentPlayTime());
+        valueAnimator.setCurrentPlayTime(property.getTransitionInfo().currentPlayTime);
 
         mValueAnimators.put(property, valueAnimator);
     }
@@ -160,8 +163,25 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
             return transition.getDuration();
         }
 
-        protected long getCurrentPlayTime(ViewProperty property, long initialStartTime) {
-            return System.currentTimeMillis() - initialStartTime - getDelaySinceBase(property);
+        protected long getCurrentPlayTime(ViewProperty property, long timePast) {
+
+//            int previousTransitionIndex = property.getTransitionInfo().index - 1;
+            List<ValueAnimator> transitionList = getTransitions(null);
+            long delayBeforeTransition = 0;
+            Log.i("getCurrentPlayTime", "transitionIndex : " + property.getTransitionInfo().index);
+            for (int i = 0; i < property.getTransitionInfo().index; i++) {
+                ValueAnimator transition = transitionList.get(i);
+                delayBeforeTransition += getDuration(transition);
+            }
+            long baseDelay = getDelayForInitialTransition(property);
+            Log.i("getCurrentPlayTime", "index : " + property.getViewIndex());
+            Log.i("getCurrentPlayTime", "timePast : " + timePast);
+            Log.i("getCurrentPlayTime", "baseDelay : " + baseDelay);
+            Log.i("getCurrentPlayTime", "delayBeforeTransition : " + delayBeforeTransition);
+
+            return timePast - getDelayForInitialTransition(property) - delayBeforeTransition;
+//            return timePast - getDelayForInitialTransition(property) - getPreviousTransitionDuration(property);
+//            return System.currentTimeMillis() - initialStartTime - getDelaySinceBase(property);
         }
     }
 }
