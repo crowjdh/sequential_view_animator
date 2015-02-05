@@ -26,14 +26,6 @@ public class ViewProperty implements Cloneable, AbstractViewProperty {
         getTransitionInfo().currentPlayTime = TransitionInfo.DEFAULT_CURRENT_PLAY_TIME;
     }
 
-//    public void setUseNextTransition(boolean useNextTransition) {
-//        getTransitionInfo().useNextTransition = useNextTransition;
-//    }
-
-//    public boolean isUseNextTransition() {
-//        return getTransitionInfo().useNextTransition;
-//    }
-
     public void resetTransitionInfo() {
         TransitionInfo resetTransitionInfo = TransitionInfoManipulator.resetTransitionInfo(getTransitionInfo());
         setTransitionInfo(resetTransitionInfo);

@@ -322,7 +322,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             return  delayForInitialTransition > timePast;
         }
 
-        protected int getTransitionIndexForProperty(ViewProperty property, long timePast) {
+        public int getTransitionIndexForProperty(ViewProperty property, long timePast) {
             List<T> transitions = getDummyTransitions();
             long transitionStartTime = getDelayForInitialTransition(property);
 //            long playTime = property.getTransitionInfo().currentPlayTime;
