@@ -69,7 +69,7 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
         SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
 
         SerialValueAnimator.ValueAnimatorProperty transitionProperty
-                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 3000);
+                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 500);
         animator.setTransitionProperty(transitionProperty);
     }
 

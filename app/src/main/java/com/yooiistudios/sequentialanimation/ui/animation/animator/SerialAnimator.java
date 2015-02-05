@@ -3,7 +3,6 @@ package com.yooiistudios.sequentialanimation.ui.animation.animator;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -314,18 +313,13 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             long startTime = getDelayForInitialTransition(property);
             long endTime = startTime + getTotalTransitionDuration();
 
-            if (property.getViewIndex() == 0) {
-                Log.i("inTimeToTransit", "view index : " + property.getViewIndex());
-                Log.i("inTimeToTransit", "timePast : " + timePast);
-                Log.i("inTimeToTransit", "startTime : " + startTime);
-                Log.i("inTimeToTransit", "endTime : " + endTime);
-            }
-
             return timePast > startTime && timePast < endTime;
         }
 
         protected boolean shouldTransitInFuture(ViewProperty property, long timePast) {
-            return getDelayForInitialTransition(property) > timePast;
+            long delayForInitialTransition = getDelayForInitialTransition(property);
+
+            return  delayForInitialTransition > timePast;
         }
 
         protected int getTransitionIndexForProperty(ViewProperty property, long timePast) {

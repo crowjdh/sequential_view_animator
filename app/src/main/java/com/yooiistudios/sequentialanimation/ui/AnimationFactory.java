@@ -17,7 +17,7 @@ import com.yooiistudios.sequentialanimation.R;
  * AnimationFactory
  */
 public class AnimationFactory {
-    private static final long ANIM_DURATION_MILLISEC = 3000;
+    private static final long ANIM_DURATION_MILLISEC = 1000;
 //    private static final Interpolator INTERPOLATOR =
 //            new CubicBezierInterpolator(.57f, .15f, .65f, .67f);
     private static final Interpolator INTERPOLATOR =
