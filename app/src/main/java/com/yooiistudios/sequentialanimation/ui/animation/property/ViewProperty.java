@@ -42,7 +42,6 @@ public class ViewProperty implements Cloneable, AbstractViewProperty {
             abstractViewProperty = viewProperty;
         } catch(CloneNotSupportedException e) {
             e.printStackTrace();
-//            throw new CloneNotSupportedException("");
             abstractViewProperty = new NullViewProperty();
         }
 
@@ -149,7 +148,6 @@ public class ViewProperty implements Cloneable, AbstractViewProperty {
             StringBuilder builder = new StringBuilder();
             builder.append("Transition index: ").append(index)
                     .append("\nCurrent play time: ").append(currentPlayTime);
-//                    .append("\nuseNextTransition: ").append(useNextTransition);
 
             return builder.toString();
         }

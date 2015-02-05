@@ -3,6 +3,7 @@ package com.yooiistudios.sequentialanimation.ui.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.Animatable;
@@ -43,7 +44,7 @@ public abstract class BaseFragment<T, S extends SerialAnimator> extends Fragment
 
     @Override
     public void onAnimationEnd(ViewProperty property) {
-//        Log.i(getClass().getSimpleName(), "Animation end. Index : " + property.getViewIndex());
+        Log.i(getClass().getSimpleName(), "Animation end. Index : " + property.getViewIndex());
     }
 
     @NonNull

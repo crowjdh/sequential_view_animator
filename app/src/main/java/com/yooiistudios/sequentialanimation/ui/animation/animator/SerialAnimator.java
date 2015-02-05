@@ -46,9 +46,9 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         mTransitionHandler.removeCallbacksAndMessages(null);
     }
 
-//    public void cancelTransitionAt(int index) {
-//        mTransitionHandler.removeMessages(index);
-//    }
+    public void cancelTransitionAt(int index) {
+        mTransitionHandler.removeMessages(index);
+    }
 
     private void prepareForNewTransitionSequence() {
         mStartTimeInMilli = System.currentTimeMillis();
@@ -79,8 +79,10 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         Message message = Message.obtain();
         message.obj = viewProperty;
         // 이미 등록된 메시지를 취소하는 데에 쓰일 값
-        message.what = viewProperty.getViewIndex();
+        int messageId = viewProperty.getViewIndex();
+        message.what = messageId;
 
+        cancelTransitionAt(messageId);
         mTransitionHandler.sendMessageDelayed(message, delay);
     }
 
