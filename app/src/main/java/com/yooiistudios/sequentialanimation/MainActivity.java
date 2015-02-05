@@ -43,6 +43,7 @@ public class MainActivity extends ActionBarActivity
 
     private void init(Bundle savedInstanceState) {
         findViewById(R.id.animate).setOnClickListener(this);
+        findViewById(R.id.cancel).setOnClickListener(this);
         initFragment(savedInstanceState);
     }
 
@@ -159,6 +160,13 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onClick(final View v) {
-        getCurrentFragment().startAnimation();
+        switch (v.getId()) {
+            case R.id.animate:
+                getCurrentFragment().startAnimation();
+                break;
+            case R.id.cancel:
+                getCurrentFragment().stopAnimation();
+                break;
+        }
     }
 }

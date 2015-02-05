@@ -14,11 +14,11 @@ import android.widget.ProgressBar;
 
 import com.yooiistudios.sequentialanimation.R;
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
-import com.yooiistudios.sequentialanimation.ui.recyclerview.SimpleAdapter;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoration;
+import com.yooiistudios.sequentialanimation.ui.recyclerview.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,22 +58,11 @@ public class RecyclerViewValueAnimatorFragment extends ValueAnimatorFragment
     }
 
     private void initRecyclerView() {
-        setRecyclerListener();
         initLayoutManager();
         initAdapter();
         initItemDecoration();
 
         configLayoutSpan();
-    }
-
-    private void setRecyclerListener() {
-//        mRecycler.setRecyclerListener(new RecyclerView.RecyclerListener() {
-//            @Override
-//            public void onViewRecycled(RecyclerView.ViewHolder holder) {
-//                int index = ((SimpleAdapter.ProgressViewHolder)holder).index;
-//                getSequentialViewAnimator().removePropertyWithIndex(index);
-//            }
-//        });
     }
 
     private void initAnimator() {

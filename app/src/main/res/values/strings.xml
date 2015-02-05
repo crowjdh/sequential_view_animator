@@ -8,4 +8,5 @@
     <string name="action_value_recycler">RecyclerView.V</string>
 
     <string name="animate">Animate</string>
+    <string name="cancel">Cancel</string>
 </resources>

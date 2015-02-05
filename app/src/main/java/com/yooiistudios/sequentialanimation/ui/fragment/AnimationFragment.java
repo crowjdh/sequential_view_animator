@@ -40,7 +40,4 @@ public abstract class AnimationFragment extends BaseFragment<Animation, SerialAn
 
         return animList;
     }
-
-    @Override
-    public abstract void startAnimation();
 }

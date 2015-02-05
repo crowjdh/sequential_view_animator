@@ -47,6 +47,10 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         mTransitionHandler.removeCallbacksAndMessages(null);
     }
 
+//    public void cancelTransitionAt(int index) {
+//        mTransitionHandler.removeMessages(index);
+//    }
+
     private void prepareForNewTransitionSequence() {
         mStartTimeInMilli = System.currentTimeMillis();
 //        mIsAnimating = true;
@@ -71,9 +75,12 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     }
 
     protected void requestTransitionWithDelayConsume(ViewProperty viewProperty, long consume) {
+        ViewTransientUtils.setState(viewProperty);
         long delay = getTransitionProperty().getDelay(viewProperty) - consume;
         Message message = Message.obtain();
         message.obj = viewProperty;
+        // 이미 등록된 메시지를 취소하는 데에 쓰일 값
+        message.what = viewProperty.getViewIndex();
 
         mTransitionHandler.sendMessageDelayed(message, delay);
     }
@@ -102,7 +109,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
     }
 
     private void transit(ViewProperty property) {
-        ViewTransientUtils.setState(property);
+//        ViewTransientUtils.setState(property);
         S listener = makeTransitionListener(property);
         onTransit(property, listener);
     }
@@ -118,6 +125,25 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             mViewProperties.get(idx).setAnimationListener(requestedViewProperty.getAnimationListener());
         }
     }
+
+//    public void notifyOnItemRangeChanged(int startPosition, int endPosition) {
+//        cancelAndRemoveWithRange(0, startPosition-1);
+//        int lastItemKey = mViewProperties.keyAt(mViewProperties.size() - 1);
+//        cancelAndRemoveWithRange(endPosition + 1, lastItemKey);
+//    }
+//
+//    private void cancelAndRemoveWithRange(int startPosition, int endPosition) {
+//        for (int i = startPosition; i <= endPosition; i++) {
+//            // SparseArray 의 keyAt 메서드 특성상 아래와 같이 쿼리하면 key 의 ascending order 로 결과값이 나온다.
+//            Log.i("onViewRecycled", "index : " + i);
+////            cancelTransitionAt(i);
+//            removeViewAt(i);
+//        }
+//    }
+
+//    public void removeViewAt(int index) {
+//        mViewProperties.delete(index);
+//    }
 
     public void setTransitionProperty(T transitionProperty) {
         mTransitionProperty = transitionProperty;
