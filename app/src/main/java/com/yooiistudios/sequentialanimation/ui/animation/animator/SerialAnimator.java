@@ -37,21 +37,14 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
 
     public void animate() {
         if (isReadyForTransition()) {
-            onAnimate();
             cancelAllTransitions();
             prepareForNewTransitionSequence();
             runSequentialTransition();
         }
     }
 
-    protected abstract void onAnimate();
-
     public void cancelAllTransitions() {
         mTransitionHandler.removeCallbacksAndMessages(null);
-    }
-
-    public void cancelTransition(int index) {
-        mTransitionHandler.removeMessages(index);
     }
 
     private void prepareForNewTransitionSequence() {
@@ -81,8 +74,6 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         long delay = getTransitionProperty().getDelay(viewProperty) - consume;
         Message message = Message.obtain();
         message.obj = viewProperty;
-        // 핸들러에서 메시지를 제거하기 위해 what 값이 필요함.
-        message.what = viewProperty.getViewIndex();
 
         mTransitionHandler.sendMessageDelayed(message, delay);
     }
@@ -123,8 +114,6 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         if (viewProperty == null) {
             mViewProperties.put(idx, requestedViewProperty);
         } else {
-            // remove handler
-            cancelTransition(idx);
             mViewProperties.get(idx).setView(requestedViewProperty.getView());
             mViewProperties.get(idx).setAnimationListener(requestedViewProperty.getAnimationListener());
         }
@@ -310,11 +299,7 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
         }
 
         protected boolean shouldTransitInFuture(ViewProperty property, long timePast) {
-            long delayForInitialTransition = getDelayForInitialTransition(property);
-            Log.i("shouldTransitInFuture", "delayForInitialTransition : " +
-                    delayForInitialTransition);
-            Log.i("shouldTransitInFuture", "timePast : " + timePast);
-            return delayForInitialTransition > timePast;
+            return getDelayForInitialTransition(property) > timePast;
         }
 
         protected int getTransitionIndexForProperty(ViewProperty property, long timePast) {
@@ -335,17 +320,6 @@ public abstract class SerialAnimator<T extends SerialAnimator.TransitionProperty
             }
 
             return transitionIndex;
-        }
-
-        protected long getTotalDurationBefore(ViewProperty viewProperty) {
-            List<T> transitionList = getTransitions(null);
-            long delayBeforeTransition = 0;
-            for (int i = 0; i < viewProperty.getTransitionInfo().index; i++) {
-                T transition = transitionList.get(i);
-                delayBeforeTransition += getDuration(transition);
-            }
-
-            return delayBeforeTransition;
         }
 
         protected abstract long getDuration(T transition);

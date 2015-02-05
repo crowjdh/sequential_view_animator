@@ -42,9 +42,6 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
         }
     }
 
-    @Override
-    protected void onAnimate() { }
-
     private void startAnimation(ViewProperty property, Animation animation) {
 //        animation.setAnimationListener(makeTransitionListener(property));
         View viewToAnimate = property.getView();

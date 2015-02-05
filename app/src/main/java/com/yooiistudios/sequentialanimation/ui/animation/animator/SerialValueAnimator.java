@@ -8,6 +8,7 @@ import android.util.Log;
 import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
 import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,6 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         SerialValueAnimator.ValueTransitionListener> {
     private static final String TAG = SerialValueAnimator.class.getSimpleName();
     private Map<ViewProperty, ValueAnimator> mValueAnimators;
-    // TODO 상위 클래스로 올려야 하는데...
-    private boolean mIsAnimating;
 
     public SerialValueAnimator() {
         mValueAnimators = new HashMap<>();
@@ -40,21 +39,21 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         ValueAnimatorProperty transitionProperty = getTransitionProperty();
         long timePast = System.currentTimeMillis() - getStartTimeInMilli();
         if (transitionProperty.inTimeToTransit(viewProperty, timePast)) {
-            viewProperty.getTransitionInfo().index =
-                    transitionProperty.getTransitionIndexForProperty(viewProperty, timePast);
-            viewProperty.getTransitionInfo().currentPlayTime =
-                    transitionProperty.getCurrentPlayTime(viewProperty, timePast);
+            int transitionIndex = transitionProperty.getTransitionIndexForProperty(viewProperty, timePast);
+            viewProperty.getTransitionInfo().index = transitionIndex;
 
+            long currentPlayTime = transitionProperty.getCurrentPlayTime(viewProperty, timePast);
+            viewProperty.getTransitionInfo().currentPlayTime = currentPlayTime;
+
+            Log.i("putViewPropertyIfRoom", "View index : " + idx);
+            Log.i("putViewPropertyIfRoom", "inTimeToTransit");
+            Log.i("putViewPropertyIfRoom", "transitionIndex : " + transitionIndex);
+            Log.i("putViewPropertyIfRoom", "currentPlayTime : " + currentPlayTime);
             transitAndRequestNext(viewProperty);
-        } else if (transitionProperty.shouldTransitInFuture(viewProperty, timePast)){
-            long consume = transitionProperty.getTotalDurationBefore(viewProperty);
-            Log.i("shouldTransitInFuture", "view index : " + viewProperty.getViewIndex());
-            Log.i("shouldTransitInFuture", "consume : " + consume);
-            requestTransitionWithDelayConsume(viewProperty, consume);
+        } else if (transitionProperty.shouldTransitInFuture(viewProperty, getStartTimeInMilli())){
+            Log.i("putViewPropertyIfRoom", "shouldTransitInFuture");
         }
-//        if (animating) {
-//            // TODO 리펙터 해야 하는데 어떻게 해야 할까?
-//        }
+        // TODO 지금은 애니메이션할 시간이 아니지만 후에 애니메이션해야될 녀석들 처리
     }
 
     @Override
@@ -70,11 +69,6 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         valueAnimator.setCurrentPlayTime(property.getTransitionInfo().currentPlayTime);
 
         mValueAnimators.put(property, valueAnimator);
-    }
-
-    @Override
-    protected void onAnimate() {
-        mIsAnimating = true;
     }
 
     @Override
@@ -98,7 +92,7 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
 
     @Override
     protected ValueTransitionListener makeTransitionListener(ViewProperty property) {
-        ValueTransitionListener listener = new ValueTransitionListener(property);
+        ValueTransitionListener listener = new ValueTransitionListener(this, property);
         // FIXME 아래 라인 copy & paste 임. super 로 빼야 할듯
         listener.setIsLastTransition(isLastTransition(property));
 
@@ -107,10 +101,12 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
 
     protected static class ValueTransitionListener
             implements SerialAnimator.TransitionListener, ValueAnimator.AnimatorListener {
+        private WeakReference<SerialAnimator> mAnimatorWeakReference;
         private ViewProperty mViewProperty;
         private boolean mIsLastTransition;
 
-        public ValueTransitionListener(ViewProperty viewProperty) {
+        public ValueTransitionListener(SerialAnimator animator, ViewProperty viewProperty) {
+            mAnimatorWeakReference = new WeakReference<>(animator);
             mViewProperty = viewProperty;
         }
 
@@ -168,7 +164,22 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         }
 
         protected long getCurrentPlayTime(ViewProperty property, long timePast) {
-            return timePast - getDelayForInitialTransition(property) - getTotalDurationBefore(property);
+
+//            int previousTransitionIndex = property.getTransitionInfo().index - 1;
+            List<ValueAnimator> transitionList = getTransitions(null);
+            long delayBeforeTransition = 0;
+            Log.i("getCurrentPlayTime", "transitionIndex : " + property.getTransitionInfo().index);
+            for (int i = 0; i < property.getTransitionInfo().index; i++) {
+                ValueAnimator transition = transitionList.get(i);
+                delayBeforeTransition += getDuration(transition);
+            }
+            long baseDelay = getDelayForInitialTransition(property);
+            Log.i("getCurrentPlayTime", "index : " + property.getViewIndex());
+            Log.i("getCurrentPlayTime", "timePast : " + timePast);
+            Log.i("getCurrentPlayTime", "baseDelay : " + baseDelay);
+            Log.i("getCurrentPlayTime", "delayBeforeTransition : " + delayBeforeTransition);
+
+            return timePast - getDelayForInitialTransition(property) - delayBeforeTransition;
 //            return timePast - getDelayForInitialTransition(property) - getPreviousTransitionDuration(property);
 //            return System.currentTimeMillis() - initialStartTime - getDelaySinceBase(property);
         }
