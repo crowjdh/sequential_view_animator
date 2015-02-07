@@ -1,9 +1,10 @@
-package com.yooiistudios.sequentialanimation.ui.animation;
+package com.yooiistudios.serialanimator;
 
 import android.support.v4.view.ViewCompat;
 import android.view.View;
 
-import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.serialanimator.property.ViewProperty;
+
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.

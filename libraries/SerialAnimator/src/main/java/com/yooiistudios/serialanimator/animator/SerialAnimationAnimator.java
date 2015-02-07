@@ -1,17 +1,16 @@
-package com.yooiistudios.sequentialanimation.ui.animation.animator;
+package com.yooiistudios.serialanimator.animator;
 
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.Animation;
 
-import com.yooiistudios.sequentialanimation.ui.AnimationListenerImpl;
-import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
-import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.serialanimator.AnimationListenerImpl;
+import com.yooiistudios.serialanimator.ViewTransientUtils;
+import com.yooiistudios.serialanimator.property.ViewProperty;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator.AnimationProperty;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
@@ -19,7 +18,7 @@ import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialA
  * SerialAnimationAnimator
  *  android.view.animation.Animation 객체를 사용하는 애니메이터
  */
-public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
+public class SerialAnimationAnimator extends SerialAnimator<SerialAnimationAnimator.AnimationProperty,
         SerialAnimationAnimator.AnimationTransitionListener> {
 
     @Override
@@ -32,8 +31,8 @@ public class SerialAnimationAnimator extends SerialAnimator<AnimationProperty,
     }
 
     @Override
-    public void cancelAllTransitions() {
-        super.cancelAllTransitions();
+    public void cancelAllHandlerMessages() {
+        super.cancelAllHandlerMessages();
         for (int i = 0; i < getViewProperties().size(); i++) {
             int propertyIndex = getViewProperties().keyAt(i);
             ViewProperty property = getViewProperties().get(propertyIndex);

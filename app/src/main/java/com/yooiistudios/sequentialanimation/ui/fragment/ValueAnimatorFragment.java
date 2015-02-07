@@ -2,7 +2,8 @@ package com.yooiistudios.sequentialanimation.ui.fragment;
 
 import android.animation.ValueAnimator;
 
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
+import com.yooiistudios.serialanimator.animator.SerialValueAnimator;
+
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 30.

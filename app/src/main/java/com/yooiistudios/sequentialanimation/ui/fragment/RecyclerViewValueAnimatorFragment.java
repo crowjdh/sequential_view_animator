@@ -14,11 +14,11 @@ import android.widget.ProgressBar;
 
 import com.yooiistudios.sequentialanimation.R;
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
-import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
 import com.yooiistudios.sequentialanimation.ui.recyclerview.DividerItemDecoration;
 import com.yooiistudios.sequentialanimation.ui.recyclerview.SimpleAdapter;
+import com.yooiistudios.serialanimator.animator.SerialAnimator;
+import com.yooiistudios.serialanimator.animator.SerialValueAnimator;
+import com.yooiistudios.serialanimator.property.ViewProperty;
 
 import java.util.ArrayList;
 import java.util.List;

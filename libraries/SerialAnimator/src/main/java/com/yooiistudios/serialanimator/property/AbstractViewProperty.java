@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimation.ui.animation.property;
+package com.yooiistudios.serialanimator.property;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 2. 4.

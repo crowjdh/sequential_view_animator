@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.animation.Animation;
 
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimationAnimator;
+import com.yooiistudios.serialanimator.animator.SerialAnimationAnimator;
 
 import java.util.ArrayList;
 import java.util.List;

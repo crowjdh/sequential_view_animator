@@ -1,4 +1,4 @@
-package com.yooiistudios.sequentialanimation.ui.animation.property;
+package com.yooiistudios.serialanimator.property;
 
 import android.view.View;
 

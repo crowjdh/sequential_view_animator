@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 
 import com.yooiistudios.sequentialanimation.R;
 import com.yooiistudios.sequentialanimation.ui.AnimationFactory;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator;
-import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.serialanimator.animator.SerialValueAnimator;
+import com.yooiistudios.serialanimator.property.ViewProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +42,13 @@ public class StaticValueAnimatorFragment extends ValueAnimatorFragment {
             mTarget1 = rootView.findViewById(R.id.target1);
             mTarget2 = rootView.findViewById(R.id.target2);
             mTarget3 = rootView.findViewById(R.id.target3);
+
+
+            SerialValueAnimator.ValueAnimatorProperty transitionProperty
+                    = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 1000);
+
+            SerialValueAnimator animator = (SerialValueAnimator)getSequentialViewAnimator();
+            animator.setTransitionProperty(transitionProperty);
         }
     }
 
@@ -132,11 +139,6 @@ public class StaticValueAnimatorFragment extends ValueAnimatorFragment {
         animator.putViewPropertyIfRoom(property1, 1);
         animator.putViewPropertyIfRoom(property2, 2);
         animator.putViewPropertyIfRoom(property3, 3);
-
-        SerialValueAnimator.ValueAnimatorProperty transitionProperty
-                = new SerialValueAnimator.ValueAnimatorProperty(this, 0, 1000);
-
-        animator.setTransitionProperty(transitionProperty);
 
         animator.animate();
     }

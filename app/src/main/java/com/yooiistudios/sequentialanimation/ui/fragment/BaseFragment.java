@@ -7,9 +7,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.yooiistudios.sequentialanimation.ui.Animatable;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator;
-import com.yooiistudios.sequentialanimation.ui.animation.animator.SerialAnimator.TransitionProperty;
-import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.serialanimator.animator.SerialAnimator;
+import com.yooiistudios.serialanimator.property.ViewProperty;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ import java.util.List;
  */
 public abstract class BaseFragment<T, S extends SerialAnimator> extends Fragment
         implements ViewProperty.AnimationListener,
-        TransitionProperty.TransitionSupplier<T>,
+        SerialAnimator.TransitionProperty.TransitionSupplier<T>,
         Animatable {
     private SerialAnimator mAnimator;
 
@@ -53,6 +52,6 @@ public abstract class BaseFragment<T, S extends SerialAnimator> extends Fragment
 
     @Override
     public void stopAnimation() {
-        getSequentialViewAnimator().cancelAllTransitions();
+        getSequentialViewAnimator().cancelAllHandlerMessages();
     }
 }

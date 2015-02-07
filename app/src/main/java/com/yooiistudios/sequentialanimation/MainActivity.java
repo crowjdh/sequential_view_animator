@@ -84,8 +84,10 @@ public class MainActivity extends ActionBarActivity
                 return true;
             case R.id.action_anim_recycler:
                 showAnimationRecyclerFragment();
+                return true;
             case R.id.action_value_static:
                 showValueAnimatorStaticFragment();
+                return true;
             case R.id.action_value_recycler:
                 showValueAnimatorRecyclerFragment();
                 return true;

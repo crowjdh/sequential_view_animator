@@ -1,17 +1,15 @@
-package com.yooiistudios.sequentialanimation.ui.animation.animator;
+package com.yooiistudios.serialanimator.animator;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.support.annotation.NonNull;
 
-import com.yooiistudios.sequentialanimation.ui.animation.ViewTransientUtils;
-import com.yooiistudios.sequentialanimation.ui.animation.property.ViewProperty;
+import com.yooiistudios.serialanimator.ViewTransientUtils;
+import com.yooiistudios.serialanimator.property.ViewProperty;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialValueAnimator.ValueAnimatorProperty;
 
 /**
  * Created by Dongheyon Jeong in SequentialAnimationTest from Yooii Studios Co., LTD. on 15. 1. 29.
@@ -19,7 +17,7 @@ import static com.yooiistudios.sequentialanimation.ui.animation.animator.SerialV
  * SerialValueAnimator
  *  android.view.animation.Animation 객체를 사용하는 애니메이터
  */
-public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
+public class SerialValueAnimator extends SerialAnimator<SerialValueAnimator.ValueAnimatorProperty,
         SerialValueAnimator.ValueTransitionListener> {
     private Map<ViewProperty, ValueAnimator> mValueAnimators;
 
@@ -40,18 +38,26 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
         ValueAnimatorProperty transitionProperty = getTransitionProperty();
 
         if (transitionProperty.inTimeToTransit(viewProperty, timePast)) {
-            viewProperty.getTransitionInfo().index =
-                    transitionProperty.getTransitionIndexForProperty(viewProperty, timePast);
-            viewProperty.getTransitionInfo().currentPlayTime =
-                    transitionProperty.getCurrentPlayTime(viewProperty, timePast);
-
-            transitAndRequestNext(viewProperty);
+            transitInTime(viewProperty, timePast);
         } else if (transitionProperty.shouldTransitInFuture(viewProperty, timePast)){
-            viewProperty.getTransitionInfo().index =
-                    transitionProperty.getTransitionIndexForProperty(viewProperty, timePast);
-
-            requestTransitionWithDelayConsume(viewProperty, timePast);
+            transitInFuture(viewProperty, timePast);
         }
+    }
+
+    private void transitInTime(ViewProperty viewProperty, long timePast) {
+        viewProperty.getTransitionInfo().index =
+                getTransitionProperty().getTransitionIndexForProperty(viewProperty, timePast);
+        viewProperty.getTransitionInfo().currentPlayTime =
+                getTransitionProperty().getCurrentPlayTime(viewProperty, timePast);
+
+        transitAndRequestNext(viewProperty);
+    }
+
+    private void transitInFuture(ViewProperty viewProperty, long timePast) {
+        viewProperty.getTransitionInfo().index =
+                getTransitionProperty().getTransitionIndexForProperty(viewProperty, timePast);
+
+        requestTransitionWithDelayConsume(viewProperty, timePast);
     }
 
     @Override
@@ -70,13 +76,7 @@ public class SerialValueAnimator extends SerialAnimator<ValueAnimatorProperty,
     }
 
     @Override
-    protected boolean isReadyForTransition() {
-        return super.isReadyForTransition();
-    }
-
-    @Override
-    public void cancelAllTransitions() {
-        super.cancelAllTransitions();
+    public void cancelAllHandlerMessages() {
         for (Map.Entry<ViewProperty, ValueAnimator> entry : mValueAnimators.entrySet()) {
             ViewProperty viewProperty = entry.getKey();
             ValueAnimator animator = entry.getValue();
