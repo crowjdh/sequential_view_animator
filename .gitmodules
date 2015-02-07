@@ -1,0 +1,3 @@
+[submodule "libraries/serialanimator_"]
+	path = libraries/serialanimator_
+	url = https://crowjdh@github.com/crowjdh/SerialAnimator.git
