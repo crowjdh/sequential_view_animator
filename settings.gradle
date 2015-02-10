@@ -1,1 +1,1 @@
-include ':app', ':libraries:serialanimator_:app'
+include ':app', ':libraries:SerialAnimator'
